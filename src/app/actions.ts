@@ -4,12 +4,6 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import webpush from 'web-push'
 
-webpush.setVapidDetails(
-  process.env.VAPID_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-)
-
 async function getUser() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -151,7 +145,37 @@ export async function unsubscribePushAction() {
   await supabase.from('push_subscriptions').delete().eq('user_id', user.id)
 }
 
+// ─── Weekly Reflection ────────────────────────────────────────────────────────
+
+export async function saveWeeklyReflectionAction(
+  weekStart: string,
+  socialDone: boolean,
+  reflection: string
+) {
+  const { supabase, user } = await getUser()
+
+  await supabase.from('weekly_reflections').upsert(
+    {
+      user_id: user.id,
+      week_start: weekStart,
+      social_done: socialDone,
+      reflection: reflection.trim() || null,
+    },
+    { onConflict: 'user_id,week_start' }
+  )
+
+  revalidatePath('/weekly')
+}
+
+// ─── Push Notifications ───────────────────────────────────────────────────────
+
 export async function sendTestNotificationAction(message: string) {
+  webpush.setVapidDetails(
+    process.env.VAPID_EMAIL!,
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!
+  )
+
   const { supabase, user } = await getUser()
 
   const { data } = await supabase

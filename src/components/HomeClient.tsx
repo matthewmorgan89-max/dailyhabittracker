@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { Check, Plus, Trash2, ChevronRight, Zap } from 'lucide-react'
+import { Check, Plus, Trash2, ChevronRight, Zap, BarChart2, Bell } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +13,7 @@ import {
   toggleSignalItemAction,
   deleteSignalItemAction,
   updateVouchOutreachAction,
+  subscribePushAction,
 } from '@/app/actions'
 import type { DayInfo } from '@/lib/day'
 import type { HabitDefinition, HabitCategory } from '@/lib/habits'
@@ -38,6 +39,15 @@ interface Props {
   outreach: VouchOutreach | null
 }
 
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i)
+  return outputArray
+}
+
 export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach }: Props) {
   const [, startTransition] = useTransition()
 
@@ -53,6 +63,38 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
   const signalInputRef = useRef<HTMLInputElement>(null)
 
   const isAfter5pm = new Date().getHours() >= 17
+  const [pushEnabled, setPushEnabled] = useState<boolean | null>(null)
+  const [pushLoading, setPushLoading] = useState(false)
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
+        .then((reg) => reg.pushManager.getSubscription())
+        .then((sub) => setPushEnabled(!!sub))
+        .catch(() => setPushEnabled(false))
+    } else {
+      setPushEnabled(false)
+    }
+  }, [])
+
+  async function enablePush() {
+    setPushLoading(true)
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!
+        ),
+      })
+      const serialized = JSON.parse(JSON.stringify(sub))
+      await subscribePushAction(serialized)
+      setPushEnabled(true)
+    } catch (e) {
+      console.error('Push subscribe failed:', e)
+    }
+    setPushLoading(false)
+  }
 
   useEffect(() => {
     if (showSignalInput) signalInputRef.current?.focus()
@@ -166,8 +208,25 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
             <h1 className="text-2xl font-bold tracking-tight">The Work</h1>
             <p className="text-muted-foreground text-sm mt-0.5">{today.displayDate}</p>
           </div>
-          <Badge variant={dayBadgeVariant} className="mt-1">{today.label}</Badge>
+          <div className="flex items-center gap-2 mt-1">
+            <Badge variant={dayBadgeVariant}>{today.label}</Badge>
+            <Link href="/weekly" className="text-muted-foreground hover:text-foreground transition-colors" title="This week">
+              <BarChart2 className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
+
+        {/* Push notification prompt */}
+        {pushEnabled === false && (
+          <button
+            onClick={enablePush}
+            disabled={pushLoading}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Bell className="h-3.5 w-3.5" />
+            {pushLoading ? 'Enabling...' : 'Enable daily reminders'}
+          </button>
+        )}
 
         {/* Progress */}
         <div className="space-y-1.5">
