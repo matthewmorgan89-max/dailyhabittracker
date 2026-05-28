@@ -101,6 +101,19 @@ export async function updateVouchOutreachAction(
   revalidatePath('/')
 }
 
+// ─── Daily Intention ─────────────────────────────────────────────────────────
+
+export async function saveIntentionAction(date: string, intention: string) {
+  const { supabase, user } = await getUser()
+
+  await supabase.from('daily_intentions').upsert(
+    { user_id: user.id, date, intention: intention.trim() },
+    { onConflict: 'user_id,date' }
+  )
+
+  revalidatePath('/')
+}
+
 // ─── Evening Reflection ───────────────────────────────────────────────────────
 
 export async function saveEveningReflectionAction(

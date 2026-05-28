@@ -14,7 +14,7 @@ export default async function HomePage() {
   const habits = getHabitsForDay(today.type)
   const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd')
 
-  const [completionsResult, signalResult, outreachResult, eveningResult] = await Promise.all([
+  const [completionsResult, signalResult, outreachResult, eveningResult, intentionResult] = await Promise.all([
     supabase
       .from('habit_completions')
       .select('habit_key')
@@ -38,6 +38,12 @@ export default async function HomePage() {
       .eq('user_id', user.id)
       .eq('date', yesterday)
       .single(),
+    supabase
+      .from('daily_intentions')
+      .select('intention')
+      .eq('user_id', user.id)
+      .eq('date', today.dateStr)
+      .single(),
   ])
 
   const completedKeys = (completionsResult.data ?? []).map(
@@ -45,6 +51,7 @@ export default async function HomePage() {
   )
 
   const lastNightSignal: string[] = eveningResult.data?.tomorrow_signal ?? []
+  const todayIntention: string | null = intentionResult.data?.intention ?? null
 
   return (
     <HomeClient
@@ -55,6 +62,7 @@ export default async function HomePage() {
       signalItems={signalResult.data ?? []}
       outreach={outreachResult.data ?? null}
       lastNightSignal={lastNightSignal}
+      todayIntention={todayIntention}
     />
   )
 }

@@ -10,6 +10,7 @@ import {
   deleteSignalItemAction,
   updateVouchOutreachAction,
   subscribePushAction,
+  saveIntentionAction,
 } from '@/app/actions'
 import type { DayInfo } from '@/lib/day'
 import { FROG_QUOTE } from '@/lib/day'
@@ -35,6 +36,7 @@ interface Props {
   signalItems: SignalItem[]
   outreach: VouchOutreach | null
   lastNightSignal: string[]
+  todayIntention: string | null
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -46,7 +48,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray
 }
 
-export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach, lastNightSignal }: Props) {
+export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach, lastNightSignal, todayIntention }: Props) {
   const [, startTransition] = useTransition()
 
   const [optimisticCompleted, setOptimisticCompleted] = useState<Set<string>>(
@@ -58,6 +60,22 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
   const [signalInput, setSignalInput] = useState('')
   const [showSignalInput, setShowSignalInput] = useState(false)
   const signalInputRef = useRef<HTMLInputElement>(null)
+
+  // Morning contract state
+  const [intention, setIntention] = useState<string | null>(todayIntention)
+  const [intentionInput, setIntentionInput] = useState('')
+  const [intentionLoading, setIntentionLoading] = useState(false)
+  const isBeforeNoon = new Date().getHours() < 12
+  const showGate = !intention && isBeforeNoon && today.type !== 'rest'
+
+  async function handleIntentionSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!intentionInput.trim()) return
+    setIntentionLoading(true)
+    await saveIntentionAction(today.dateStr, intentionInput.trim())
+    setIntention(intentionInput.trim())
+    setIntentionLoading(false)
+  }
 
   // Filter out last night's items already present in today's Signal (by title, case-insensitive)
   const existingTitles = new Set(localSignal.map((s) => s.title.toLowerCase()))
@@ -181,6 +199,52 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
 
   const dayBadgeColor = today.type === 'office' ? 'bg-white text-black' : today.type === 'rest' ? 'bg-white/10 text-white/60' : 'bg-white/10 text-white/80'
 
+  // ── Morning gate ──────────────────────────────────────────────────────────
+  if (showGate) {
+    return (
+      <div className="min-h-screen bg-black flex flex-col px-6 py-10">
+        <div>
+          <span className="text-sm font-black uppercase tracking-widest text-white">The Work.</span>
+        </div>
+        <div className="flex-1 flex flex-col justify-end pb-16 space-y-8">
+          <div className="space-y-2">
+            <p className="text-xs font-black uppercase tracking-widest text-primary">Morning contract</p>
+            <h1 className="text-4xl font-black uppercase leading-tight tracking-tight text-white">
+              What&apos;s the one thing that makes today a win?
+            </h1>
+            <p className="text-white/30 text-sm">If you do nothing else, do this.</p>
+          </div>
+
+          <form onSubmit={handleIntentionSubmit} className="space-y-3">
+            <textarea
+              value={intentionInput}
+              onChange={(e) => setIntentionInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleIntentionSubmit(e as unknown as React.FormEvent) } }}
+              placeholder="e.g. Send 20 personalised Vouch outreaches"
+              autoFocus
+              rows={3}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3.5 text-white placeholder:text-white/25 text-base focus:outline-none focus:border-primary transition-colors resize-none"
+            />
+            <button
+              type="submit"
+              disabled={!intentionInput.trim() || intentionLoading}
+              className="w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-30 rounded-lg font-black text-white text-base uppercase tracking-wide transition-colors"
+            >
+              {intentionLoading ? '...' : 'Commit →'}
+            </button>
+          </form>
+
+          <button
+            onClick={() => setIntention('')}
+            className="text-center text-xs text-white/20 hover:text-white/40 transition-colors"
+          >
+            Skip today
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-black max-w-lg mx-auto px-5 pb-32">
 
@@ -228,6 +292,14 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
           <p className="text-sm text-white/40 leading-relaxed italic">&ldquo;{principle.text}&rdquo;</p>
           <p className="text-xs text-white/20 mt-1">— {principle.source}</p>
         </div>
+
+        {/* Today's commitment */}
+        {intention && (
+          <div className="bg-primary rounded-lg px-4 py-3 space-y-0.5">
+            <p className="text-xs font-black uppercase tracking-widest text-white/60">Today&apos;s commitment</p>
+            <p className="text-sm font-bold text-white leading-snug">&ldquo;{intention}&rdquo;</p>
+          </div>
+        )}
 
         {/* Push prompt */}
         {pushEnabled === false && (
