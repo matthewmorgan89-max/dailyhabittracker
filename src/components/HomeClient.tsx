@@ -34,6 +34,7 @@ interface Props {
   completedKeys: string[]
   signalItems: SignalItem[]
   outreach: VouchOutreach | null
+  lastNightSignal: string[]
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -45,7 +46,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray
 }
 
-export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach }: Props) {
+export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach, lastNightSignal }: Props) {
   const [, startTransition] = useTransition()
 
   const [optimisticCompleted, setOptimisticCompleted] = useState<Set<string>>(
@@ -57,6 +58,24 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
   const [signalInput, setSignalInput] = useState('')
   const [showSignalInput, setShowSignalInput] = useState(false)
   const signalInputRef = useRef<HTMLInputElement>(null)
+
+  // Filter out last night's items already present in today's Signal (by title, case-insensitive)
+  const existingTitles = new Set(localSignal.map((s) => s.title.toLowerCase()))
+  const [dismissedFrogs, setDismissedFrogs] = useState<Set<string>>(new Set())
+  const pendingFrogs = lastNightSignal.filter(
+    (t) => !existingTitles.has(t.toLowerCase()) && !dismissedFrogs.has(t)
+  )
+
+  function addFrogToSignal(title: string) {
+    const temp: SignalItem = { id: `temp-${Date.now()}`, title, completed: false }
+    setLocalSignal((prev) => [...prev, temp])
+    setDismissedFrogs((prev) => new Set([...prev, title]))
+    startTransition(() => { addSignalItemAction(title, today.dateStr) })
+  }
+
+  function addAllFrogs() {
+    pendingFrogs.forEach((title) => addFrogToSignal(title))
+  }
 
   const isAfter5pm = new Date().getHours() >= 17
 
@@ -222,6 +241,42 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
           </button>
         )}
       </div>
+
+      {/* ── Last Night's Frog ── */}
+      {pendingFrogs.length > 0 && (
+        <section className="mb-6">
+          <div className="border border-primary/30 bg-primary/8 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🐸</span>
+                <span className="text-xs font-black uppercase tracking-widest text-primary">Last night you committed to</span>
+              </div>
+              {pendingFrogs.length > 1 && (
+                <button
+                  onClick={addAllFrogs}
+                  className="text-xs font-bold text-primary/70 hover:text-primary transition-colors"
+                >
+                  Add all →
+                </button>
+              )}
+            </div>
+            <div className="space-y-2">
+              {pendingFrogs.map((title) => (
+                <div key={title} className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-white/80 flex-1">{title}</span>
+                  <button
+                    onClick={() => addFrogToSignal(title)}
+                    className="flex-shrink-0 text-xs font-bold text-primary border border-primary/40 rounded px-2.5 py-1 hover:bg-primary/20 transition-colors"
+                  >
+                    + Signal
+                  </button>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-white/30">Eat the frog first. Everything else can wait.</p>
+          </div>
+        </section>
+      )}
 
       {/* ── Signal Section ── */}
       <section className="mb-8">
