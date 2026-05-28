@@ -101,6 +101,19 @@ export async function updateVouchOutreachAction(
   revalidatePath('/')
 }
 
+// ─── Weekly Non-Negotiables ──────────────────────────────────────────────────
+
+export async function saveWeeklyNonNegotiablesAction(weekStart: string, habitKeys: string[]) {
+  const { supabase, user } = await getUser()
+
+  await supabase.from('weekly_non_negotiables').upsert(
+    { user_id: user.id, week_start: weekStart, habit_keys: habitKeys },
+    { onConflict: 'user_id,week_start' }
+  )
+
+  revalidatePath('/')
+}
+
 // ─── Daily Intention ─────────────────────────────────────────────────────────
 
 export async function saveIntentionAction(date: string, intention: string) {

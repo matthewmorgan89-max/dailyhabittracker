@@ -1,5 +1,27 @@
 import { format, getDayOfYear } from 'date-fns'
 
+export const RELATIONSHIP_PROMPTS = [
+  { label: 'Tell someone specifically what they mean to you', why: "Not just 'love you' — say exactly why. Specificity is what lands." },
+  { label: 'Call or message someone you haven\'t spoken to in a month', why: 'Relationships atrophy without investment. One touch keeps the thread alive.' },
+  { label: 'Check in on a friend who might be going through something', why: 'Being the person who shows up when it\'s hard is rarer than it should be.' },
+  { label: 'Do one unexpected thing for your partner today', why: 'Something they didn\'t ask for. Unrequested acts say more than requests fulfilled.' },
+  { label: 'Have a real conversation — no phones, no agenda', why: 'Undivided attention is increasingly rare. It\'s one of the best things you can give.' },
+  { label: 'Send a voice note to someone who matters to you', why: 'Voice carries warmth that text can\'t. 60 seconds, lands differently.' },
+  { label: 'Make a concrete plan to see someone face-to-face', why: '"We should catch up" means nothing. A date in the calendar means everything.' },
+  { label: 'Call your sister', why: 'Family connections drift without maintenance. Don\'t let them.' },
+  { label: 'Reconnect with an old friend you\'ve been meaning to reach out to', why: 'Every week you delay makes it feel harder. The discomfort is yours, not theirs.' },
+  { label: 'Express specific gratitude to someone who\'s been in your corner', why: 'People who support you deserve to hear it. Most of them never will.' },
+  { label: 'Introduce two people who should know each other', why: 'Connectors compound. Every introduction builds your network twice.' },
+  { label: 'Put your phone away for every conversation today', why: 'Partial attention is a subtle insult. Full presence is a rare gift.' },
+  { label: 'Ask someone about their life — not their work, their actual life', why: 'Most conversations are logistics. Being the person who goes deeper is memorable.' },
+  { label: 'Share a meal or coffee with someone who energises you', why: 'You\'re an extrovert. Time with the right people is fuel, not distraction.' },
+]
+
+export function getRelationshipPromptOfDay(date: Date = new Date()) {
+  const idx = getDayOfYear(date) % RELATIONSHIP_PROMPTS.length
+  return RELATIONSHIP_PROMPTS[idx]
+}
+
 export type DayType = 'office' | 'wfh' | 'saturday' | 'rest'
 
 export interface DayInfo {

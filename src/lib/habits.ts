@@ -1,6 +1,6 @@
 import type { DayType } from './day'
 
-export type HabitCategory = 'morning' | 'vouch' | 'body' | 'mind' | 'partner'
+export type HabitCategory = 'morning' | 'vouch' | 'body' | 'mind' | 'relationships'
 
 export interface HabitDefinition {
   key: string
@@ -77,23 +77,16 @@ export const HABITS: HabitDefinition[] = [
     key: 'reading_30min',
     label: '30 min reading',
     category: 'mind',
-    why: 'Read in your field for 30 minutes. Most people won\'t. That\'s the edge.',
+    why: "Read in your field for 30 minutes. Most people won't. That's the edge.",
     appliesTo: 'all',
   },
 
-  // PARTNER
+  // RELATIONSHIPS — single rotating daily habit
   {
-    key: 'partner_checkin',
-    label: 'Shared goals check-in',
-    category: 'partner',
-    why: 'Relationships compound. Small deposits every day.',
-    appliesTo: 'all',
-  },
-  {
-    key: 'phone_away',
-    label: 'Phone away during together time',
-    category: 'partner',
-    why: 'Presence is the gift. The phone is the thief.',
+    key: 'relationship',
+    label: 'Relationship action', // overridden in page.tsx with today's rotating prompt
+    category: 'relationships',
+    why: 'Relationships compound the same way interest does. One real gesture every day.',
     appliesTo: 'all',
   },
 ]
@@ -103,7 +96,7 @@ export const CATEGORY_LABELS: Record<HabitCategory, string> = {
   vouch: 'Vouch',
   body: 'Body',
   mind: 'Mind',
-  partner: 'Partner',
+  relationships: 'Relationships',
 }
 
 export function getHabitsForDay(dayType: DayType): HabitDefinition[] {
@@ -117,4 +110,7 @@ export function getHabitsForDay(dayType: DayType): HabitDefinition[] {
   })
 }
 
-export const CATEGORY_ORDER: HabitCategory[] = ['morning', 'vouch', 'body', 'mind', 'partner']
+export const CATEGORY_ORDER: HabitCategory[] = ['morning', 'vouch', 'body', 'mind', 'relationships']
+
+// Habits eligible to be non-negotiables (excludes rotating relationship habit)
+export const NON_NEG_ELIGIBLE = HABITS.filter((h) => h.key !== 'relationship')
