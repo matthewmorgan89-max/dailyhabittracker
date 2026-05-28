@@ -2,10 +2,13 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export default function AuthPage() {
+  const router = useRouter()
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -15,18 +18,31 @@ export default function AuthPage() {
     setError('')
 
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
 
-    if (error) {
-      setError(error.message)
+    if (mode === 'login') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) {
+        setError('Wrong email or password.')
+      } else {
+        router.push('/')
+        router.refresh()
+      }
     } else {
-      setSent(true)
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) {
+        setError(error.message)
+      } else {
+        // Auto sign in after signup
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+        if (signInError) {
+          setError('Account created — check your email to confirm, then log in.')
+        } else {
+          router.push('/')
+          router.refresh()
+        }
+      }
     }
+
     setLoading(false)
   }
 
@@ -38,58 +54,72 @@ export default function AuthPage() {
         <span className="text-sm font-black uppercase tracking-widest text-white">The Work.</span>
       </div>
 
-      {/* Main content — pushed to lower third */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col justify-end pb-16 space-y-10">
 
         <div className="space-y-3">
           <h1 className="text-5xl font-black uppercase leading-none tracking-tight text-white">
             Stop making<br />excuses.
           </h1>
-          <p className="text-muted-foreground text-base">
-            Your daily discipline OS.
-          </p>
+          <p className="text-white/40 text-base">Your daily discipline OS.</p>
         </div>
 
-        {sent ? (
-          <div className="space-y-6">
-            <div className="border border-white/10 rounded-lg p-5 space-y-1">
-              <p className="font-bold text-sm">Check your email</p>
-              <p className="text-muted-foreground text-sm">
-                Sent a link to <span className="text-white">{email}</span>. Click it to get in.
-              </p>
-            </div>
-            <button
-              onClick={() => setSent(false)}
-              className="text-xs text-muted-foreground underline underline-offset-4"
-            >
-              Use a different email
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoFocus
-              className="w-full h-14 bg-white/5 border border-white/10 rounded-lg px-4 text-white placeholder:text-white/30 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-            />
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoFocus
+            className="w-full h-14 bg-white/5 border border-white/10 rounded-lg px-4 text-white placeholder:text-white/30 text-base focus:outline-none focus:border-primary transition-colors"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={6}
+            className="w-full h-14 bg-white/5 border border-white/10 rounded-lg px-4 text-white placeholder:text-white/30 text-base focus:outline-none focus:border-primary transition-colors"
+          />
 
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+          {error && (
+            <p className="text-sm text-red-400 px-1">{error}</p>
+          )}
 
+          <button
+            type="submit"
+            disabled={loading || !email || !password}
+            className="w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-30 rounded-lg font-black text-white text-base uppercase tracking-wide transition-colors"
+          >
+            {loading
+              ? '...'
+              : mode === 'login'
+              ? 'Sign in →'
+              : 'Create account →'}
+          </button>
+        </form>
+
+        {/* Toggle between login and signup */}
+        <div className="text-center">
+          {mode === 'login' ? (
             <button
-              type="submit"
-              disabled={loading || !email}
-              className="w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-40 rounded-lg font-bold text-white text-base uppercase tracking-wide transition-colors"
+              onClick={() => { setMode('signup'); setError('') }}
+              className="text-sm text-white/30 hover:text-white/60 transition-colors"
             >
-              {loading ? 'Sending...' : 'Let me in →'}
+              First time? Create an account
             </button>
-          </form>
-        )}
+          ) : (
+            <button
+              onClick={() => { setMode('login'); setError('') }}
+              className="text-sm text-white/30 hover:text-white/60 transition-colors"
+            >
+              Already have an account? Sign in
+            </button>
+          )}
+        </div>
+
       </div>
     </div>
   )
