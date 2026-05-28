@@ -39,6 +39,11 @@ export function getDayInfo(date: Date = new Date()): DayInfo {
   }
 }
 
+export const FROG_QUOTE = {
+  text: "If it's your job to eat a frog, it's best to do it first thing in the morning.",
+  source: 'Mark Twain',
+}
+
 const PRINCIPLES = [
   { text: 'Action starts emotion. You don\'t wait to feel ready — you act, and then you feel ready.', source: 'Naval Ravikant' },
   { text: 'Eat the frog first. Whatever you\'re most avoiding is the thing that most needs doing.', source: 'Brian Tracy' },

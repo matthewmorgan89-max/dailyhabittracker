@@ -12,6 +12,7 @@ import {
   subscribePushAction,
 } from '@/app/actions'
 import type { DayInfo } from '@/lib/day'
+import { FROG_QUOTE } from '@/lib/day'
 import type { HabitDefinition, HabitCategory } from '@/lib/habits'
 import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/lib/habits'
 
@@ -197,10 +198,16 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
           </div>
         </div>
 
-        {/* Principle */}
-        <div className="border-l-2 border-primary pl-4 py-0.5">
-          <p className="text-sm text-white/60 leading-relaxed italic">&ldquo;{principle.text}&rdquo;</p>
-          <p className="text-xs text-white/30 mt-1">— {principle.source}</p>
+        {/* Frog quote — always pinned */}
+        <div className="bg-primary/10 border border-primary/20 rounded-lg px-4 py-3">
+          <p className="text-sm text-white/80 leading-relaxed italic">&ldquo;{FROG_QUOTE.text}&rdquo;</p>
+          <p className="text-xs text-primary/70 mt-1 font-semibold">— {FROG_QUOTE.source}</p>
+        </div>
+
+        {/* Rotating principle */}
+        <div className="border-l-2 border-white/10 pl-4 py-0.5">
+          <p className="text-sm text-white/40 leading-relaxed italic">&ldquo;{principle.text}&rdquo;</p>
+          <p className="text-xs text-white/20 mt-1">— {principle.source}</p>
         </div>
 
         {/* Push prompt */}
