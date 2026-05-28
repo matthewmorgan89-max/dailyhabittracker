@@ -11,12 +11,12 @@ import {
   updateVouchOutreachAction,
   subscribePushAction,
   saveIntentionAction,
-  saveWeeklyNonNegotiablesAction,
+  saveDailyPrioritiesAction,
 } from '@/app/actions'
 import type { DayInfo } from '@/lib/day'
 import { FROG_QUOTE } from '@/lib/day'
 import type { HabitDefinition, HabitCategory } from '@/lib/habits'
-import { CATEGORY_LABELS, CATEGORY_ORDER, NON_NEG_ELIGIBLE } from '@/lib/habits'
+import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/lib/habits'
 import type { CoachingInsight } from '@/lib/coaching'
 
 interface SignalItem {
@@ -40,8 +40,7 @@ interface Props {
   lastNightSignal: string[]
   todayIntention: string | null
   coachingInsight: CoachingInsight | null
-  weekNonNegotiables: string[]
-  weekStart: string
+  dailyPriorities: string[]
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -55,7 +54,7 @@ function urlBase64ToUint8Array(base64String: string) {
 
 export function HomeClient({
   today, principle, habits, completedKeys, signalItems, outreach,
-  lastNightSignal, todayIntention, coachingInsight, weekNonNegotiables, weekStart,
+  lastNightSignal, todayIntention, coachingInsight, dailyPriorities,
 }: Props) {
   const [, startTransition] = useTransition()
 
@@ -82,31 +81,29 @@ export function HomeClient({
     setIntentionLoading(false)
   }
 
-  // ── Weekly non-negotiables ────────────────────────────────────────────────
-  const [weekNonNeg, setWeekNonNeg] = useState<string[]>(weekNonNegotiables)
-  const [selectedNonNeg, setSelectedNonNeg] = useState<string[]>(
-    weekNonNegotiables.length > 0
-      ? weekNonNegotiables
-      : ['mass_outreach', 'exercise', 'lights_out_10pm']
+  // ── Daily priorities ──────────────────────────────────────────────────────
+  const [todayPriorities, setTodayPriorities] = useState<string[]>(dailyPriorities)
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(
+    dailyPriorities.length > 0 ? dailyPriorities : []
   )
-  const [nonNegLoading, setNonNegLoading] = useState(false)
-  const showNonNegGate = weekNonNeg.length === 0 && today.type !== 'rest'
-  const showIntentionGate = !intention && isBeforeNoon && today.type !== 'rest' && !showNonNegGate
+  const [prioritiesLoading, setPrioritiesLoading] = useState(false)
+  const showPrioritiesGate = todayPriorities.length === 0 && today.type !== 'rest'
+  const showIntentionGate = !intention && isBeforeNoon && today.type !== 'rest' && !showPrioritiesGate
 
-  function toggleNonNeg(key: string) {
-    setSelectedNonNeg((prev) => {
+  function togglePriority(key: string) {
+    setSelectedPriorities((prev) => {
       if (prev.includes(key)) return prev.filter((k) => k !== key)
       if (prev.length >= 3) return prev
       return [...prev, key]
     })
   }
 
-  async function handleNonNegSubmit() {
-    if (selectedNonNeg.length !== 3) return
-    setNonNegLoading(true)
-    await saveWeeklyNonNegotiablesAction(weekStart, selectedNonNeg)
-    setWeekNonNeg(selectedNonNeg)
-    setNonNegLoading(false)
+  async function handlePrioritiesSubmit() {
+    if (selectedPriorities.length === 0) return
+    setPrioritiesLoading(true)
+    await saveDailyPrioritiesAction(today.dateStr, selectedPriorities)
+    setTodayPriorities(selectedPriorities)
+    setPrioritiesLoading(false)
   }
 
   // ── Last night's frog ─────────────────────────────────────────────────────
@@ -165,25 +162,25 @@ export function HomeClient({
   const totalHabits = habits.length
   const doneCount = habits.filter((h) => optimisticCompleted.has(h.key)).length
   const signalDone = localSignal.filter((s) => s.completed).length
-  const nonNegDone = weekNonNeg.filter((k) => optimisticCompleted.has(k)).length
-  const hasNonNegs = weekNonNeg.length > 0
-  const progressPct = hasNonNegs
-    ? Math.round((nonNegDone / 3) * 100)
+  const hasPriorities = todayPriorities.length > 0
+  const priorityDone = todayPriorities.filter((k) => optimisticCompleted.has(k)).length
+  const progressPct = hasPriorities
+    ? Math.round((priorityDone / todayPriorities.length) * 100)
     : totalHabits > 0 ? Math.round((doneCount / totalHabits) * 100) : 0
-  const progressLabel = hasNonNegs
-    ? `${nonNegDone}/3 non-negotiables`
+  const progressLabel = hasPriorities
+    ? `${priorityDone}/${todayPriorities.length} priorities`
     : `${doneCount}/${totalHabits}`
 
   // ── Habit grouping ────────────────────────────────────────────────────────
-  const nonNegSet = new Set(weekNonNeg)
-  const nonNegHabits = weekNonNeg
+  const prioritySet = new Set(todayPriorities)
+  const priorityHabits = todayPriorities
     .map((k) => habits.find((h) => h.key === k))
     .filter((h): h is HabitDefinition => !!h)
-  const bonusHabits = habits.filter((h) => !nonNegSet.has(h.key))
-  const byCategory = CATEGORY_ORDER.reduce<Record<HabitCategory, HabitDefinition[]>>(
+  const bonusHabits = habits.filter((h) => !prioritySet.has(h.key))
+  const byCategory = CATEGORY_ORDER.reduce<Partial<Record<HabitCategory, HabitDefinition[]>>>(
     (acc, cat) => { acc[cat] = bonusHabits.filter((h) => h.category === cat); return acc },
-    { morning: [], vouch: [], body: [], mind: [], relationships: [] }
-  )
+    {}
+  ) as Record<HabitCategory, HabitDefinition[]>
 
   function toggleHabit(key: string) {
     const next = new Set(optimisticCompleted)
@@ -236,30 +233,30 @@ export function HomeClient({
     ? 'bg-white text-black'
     : today.type === 'rest' ? 'bg-white/10 text-white/60' : 'bg-white/10 text-white/80'
 
-  // ── Gate: Weekly non-negotiables ──────────────────────────────────────────
-  if (showNonNegGate) {
+  // ── Gate: Daily priorities ────────────────────────────────────────────────
+  if (showPrioritiesGate) {
     return (
       <div className="min-h-screen bg-black flex flex-col px-6 py-10">
         <div><span className="text-sm font-black uppercase tracking-widest text-white">The Work.</span></div>
         <div className="flex-1 flex flex-col justify-end pb-16 space-y-8">
           <div className="space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest text-primary">This week&apos;s absolutes</p>
+            <p className="text-xs font-black uppercase tracking-widest text-primary">Today&apos;s priorities</p>
             <h1 className="text-4xl font-black uppercase leading-tight tracking-tight text-white">
-              Pick your 3 non-negotiables.
+              What comes first today?
             </h1>
             <p className="text-white/30 text-sm">
-              Win the week by hitting all 3. Everything else is bonus.
+              Pick up to 3. These get done before anything else.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {NON_NEG_ELIGIBLE.map((habit) => {
-              const isSelected = selectedNonNeg.includes(habit.key)
-              const isDisabled = !isSelected && selectedNonNeg.length >= 3
+            {habits.map((habit) => {
+              const isSelected = selectedPriorities.includes(habit.key)
+              const isDisabled = !isSelected && selectedPriorities.length >= 3
               return (
                 <button
                   key={habit.key}
-                  onClick={() => toggleNonNeg(habit.key)}
+                  onClick={() => togglePriority(habit.key)}
                   disabled={isDisabled}
                   className={`px-3.5 py-2 rounded-lg text-sm font-semibold border transition-all ${
                     isSelected
@@ -277,20 +274,22 @@ export function HomeClient({
 
           <div className="space-y-3">
             <p className="text-xs text-white/30 text-center">
-              {selectedNonNeg.length}/3 selected
+              {selectedPriorities.length === 0
+                ? 'Select what matters most today'
+                : `${selectedPriorities.length} selected${selectedPriorities.length < 3 ? ` — pick up to ${3 - selectedPriorities.length} more` : ' — ready'}`}
             </p>
             <button
-              onClick={handleNonNegSubmit}
-              disabled={selectedNonNeg.length !== 3 || nonNegLoading}
+              onClick={handlePrioritiesSubmit}
+              disabled={selectedPriorities.length === 0 || prioritiesLoading}
               className="w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-30 rounded-lg font-black text-white text-base uppercase tracking-wide transition-colors"
             >
-              {nonNegLoading ? '...' : 'Set for this week →'}
+              {prioritiesLoading ? '...' : 'Lock them in →'}
             </button>
             <button
-              onClick={() => setWeekNonNeg([])}
+              onClick={() => setTodayPriorities(['_skipped'])}
               className="w-full text-center text-xs text-white/20 hover:text-white/40 transition-colors"
             >
-              Skip for now
+              Skip for today
             </button>
           </div>
         </div>
@@ -541,14 +540,14 @@ export function HomeClient({
         // ── Weekday habit list ────────────────────────────────────────────
         <div className="space-y-7">
 
-          {/* Non-negotiables section */}
-          {hasNonNegs && nonNegHabits.length > 0 && (
+          {/* Priority habits */}
+          {hasPriorities && priorityHabits.length > 0 && (
             <section>
               <h2 className="text-xs font-black uppercase tracking-widest text-primary mb-3">
-                Non-negotiables
+                Today&apos;s priorities
               </h2>
               <div className="space-y-2">
-                {nonNegHabits.map((habit) => {
+                {priorityHabits.map((habit) => {
                   const done = optimisticCompleted.has(habit.key)
                   return (
                     <HabitCard key={habit.key} habit={habit} done={done} onToggle={toggleHabit} highlight>
@@ -576,18 +575,18 @@ export function HomeClient({
           )}
 
           {/* Bonus habits by category */}
-          {(hasNonNegs ? bonusHabits.length > 0 : true) && (
+          {(hasPriorities ? bonusHabits.length > 0 : true) && (
             <>
-              {hasNonNegs && bonusHabits.length > 0 && (
+              {hasPriorities && bonusHabits.length > 0 && (
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-white/8" />
-                  <span className="text-xs font-black uppercase tracking-widest text-white/20">Bonus habits</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-white/20">Everything else</span>
                   <div className="flex-1 h-px bg-white/8" />
                 </div>
               )}
 
               {CATEGORY_ORDER.map((cat) => {
-                const catHabits = hasNonNegs ? byCategory[cat] : habits.filter((h) => h.category === cat)
+                const catHabits = hasPriorities ? byCategory[cat] : habits.filter((h) => h.category === cat)
                 if (!catHabits.length) return null
 
                 return (

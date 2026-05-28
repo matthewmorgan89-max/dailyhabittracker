@@ -3,7 +3,7 @@ import { getDayInfo, getPrincipleOfDay, getRelationshipPromptOfDay } from '@/lib
 import { getHabitsForDay } from '@/lib/habits'
 import { detectCoachingInsight } from '@/lib/coaching'
 import { HomeClient } from '@/components/HomeClient'
-import { subDays, format, startOfWeek } from 'date-fns'
+import { subDays, format } from 'date-fns'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -14,7 +14,6 @@ export default async function HomePage() {
   const principle = getPrincipleOfDay()
   const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd')
   const fourteenDaysAgo = format(subDays(new Date(), 14), 'yyyy-MM-dd')
-  const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
 
   // Inject today's rotating relationship prompt into the habit definition
   const relationshipPrompt = getRelationshipPromptOfDay()
@@ -69,10 +68,10 @@ export default async function HomePage() {
       .gte('date', fourteenDaysAgo)
       .lt('date', today.dateStr),
     supabase
-      .from('weekly_non_negotiables')
+      .from('daily_priorities')
       .select('habit_keys')
       .eq('user_id', user.id)
-      .eq('week_start', weekStart)
+      .eq('date', today.dateStr)
       .single(),
   ])
 
@@ -83,7 +82,7 @@ export default async function HomePage() {
   const todayIntention: string | null = intentionResult.data?.intention ?? null
   const history = (historyResult.data ?? []) as { habit_key: string; date: string }[]
   const coachingInsight = detectCoachingInsight(history, today.dateStr)
-  const weekNonNegotiables: string[] = nonNegResult.data?.habit_keys ?? []
+  const dailyPriorities: string[] = nonNegResult.data?.habit_keys ?? []
 
   return (
     <HomeClient
@@ -96,8 +95,7 @@ export default async function HomePage() {
       lastNightSignal={lastNightSignal}
       todayIntention={todayIntention}
       coachingInsight={coachingInsight}
-      weekNonNegotiables={weekNonNegotiables}
-      weekStart={weekStart}
+      dailyPriorities={dailyPriorities}
     />
   )
 }
