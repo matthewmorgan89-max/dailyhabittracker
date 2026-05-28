@@ -15,6 +15,7 @@ import {
 import type { DayInfo } from '@/lib/day'
 import { FROG_QUOTE } from '@/lib/day'
 import type { HabitDefinition, HabitCategory } from '@/lib/habits'
+import type { CoachingInsight } from '@/lib/coaching'
 import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/lib/habits'
 
 interface SignalItem {
@@ -37,6 +38,7 @@ interface Props {
   outreach: VouchOutreach | null
   lastNightSignal: string[]
   todayIntention: string | null
+  coachingInsight: CoachingInsight | null
 }
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -48,7 +50,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray
 }
 
-export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach, lastNightSignal, todayIntention }: Props) {
+export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach, lastNightSignal, todayIntention, coachingInsight }: Props) {
   const [, startTransition] = useTransition()
 
   const [optimisticCompleted, setOptimisticCompleted] = useState<Set<string>>(
@@ -313,6 +315,16 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
           </button>
         )}
       </div>
+
+      {/* ── Pattern coaching ── */}
+      {coachingInsight && (
+        <section className="mb-6">
+          <div className="border border-white/10 bg-white/3 rounded-xl p-4 space-y-1.5">
+            <p className="text-xs font-black uppercase tracking-widest text-white/30">Pattern spotted</p>
+            <p className="text-sm text-white/70 leading-relaxed">{coachingInsight.message}</p>
+          </div>
+        </section>
+      )}
 
       {/* ── Last Night's Frog ── */}
       {pendingFrogs.length > 0 && (
