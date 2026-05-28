@@ -16,9 +16,16 @@ export const HABITS: HabitDefinition[] = [
   // MORNING
   {
     key: 'laptop_7am',
-    label: 'Laptop by 7am',
+    label: 'Laptop by 7:30am',
     category: 'morning',
     why: 'The morning is your moat. No one is in your way yet.',
+    appliesTo: 'vouch_days',
+  },
+  {
+    key: 'journaling',
+    label: 'Morning journal',
+    category: 'morning',
+    why: "5 minutes. What's on your mind, what you're grateful for, what you need to solve. Bartlett calls it his most important habit — clarity before noise.",
     appliesTo: 'vouch_days',
   },
   {
@@ -30,6 +37,13 @@ export const HABITS: HabitDefinition[] = [
   },
 
   // VOUCH
+  {
+    key: 'social_media_post',
+    label: 'Post about Vouch',
+    category: 'vouch',
+    why: 'The founder who builds in public wins. Your personal brand is Vouch\'s cheapest marketing channel.',
+    appliesTo: 'vouch_days',
+  },
   {
     key: 'mass_outreach',
     label: 'Mass market outreach',
@@ -75,9 +89,9 @@ export const HABITS: HabitDefinition[] = [
   },
   {
     key: 'reading_30min',
-    label: '30 min reading',
+    label: 'Non-fiction book or podcast',
     category: 'mind',
-    why: "Read in your field for 30 minutes. Most people won't. That's the edge.",
+    why: "30 minutes in your field. Most people won't. That's the edge.",
     appliesTo: 'all',
   },
 
@@ -112,5 +126,5 @@ export function getHabitsForDay(dayType: DayType): HabitDefinition[] {
 
 export const CATEGORY_ORDER: HabitCategory[] = ['morning', 'vouch', 'body', 'mind', 'relationships']
 
-// Habits eligible to be non-negotiables (excludes rotating relationship habit)
-export const NON_NEG_ELIGIBLE = HABITS.filter((h) => h.key !== 'relationship')
+// Habits eligible to be daily priorities (excludes rotating relationship habit)
+export const PRIORITY_ELIGIBLE = HABITS.filter((h) => h.key !== 'relationship')
