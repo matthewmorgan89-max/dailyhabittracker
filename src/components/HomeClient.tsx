@@ -3,10 +3,6 @@
 import { useState, useTransition, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Check, Plus, Trash2, ChevronRight, Zap, BarChart2, Bell } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Progress } from '@/components/ui/progress'
 import {
   toggleHabitAction,
   addSignalItemAction,
@@ -51,7 +47,6 @@ function urlBase64ToUint8Array(base64String: string) {
 export function HomeClient({ today, principle, habits, completedKeys, signalItems, outreach }: Props) {
   const [, startTransition] = useTransition()
 
-  // Optimistic state
   const [optimisticCompleted, setOptimisticCompleted] = useState<Set<string>>(
     new Set(completedKeys)
   )
@@ -63,6 +58,7 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
   const signalInputRef = useRef<HTMLInputElement>(null)
 
   const isAfter5pm = new Date().getHours() >= 17
+
   const [pushEnabled, setPushEnabled] = useState<boolean | null>(null)
   const [pushLoading, setPushLoading] = useState(false)
 
@@ -100,7 +96,6 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
     if (showSignalInput) signalInputRef.current?.focus()
   }, [showSignalInput])
 
-  // Sync props on server refresh
   useEffect(() => {
     setOptimisticCompleted(new Set(completedKeys))
     setLocalSignal(signalItems)
@@ -116,60 +111,36 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
     if (next.has(key)) next.delete(key)
     else next.add(key)
     setOptimisticCompleted(next)
-
-    startTransition(() => {
-      toggleHabitAction(key, today.dateStr)
-    })
+    startTransition(() => { toggleHabitAction(key, today.dateStr) })
   }
 
   function addSignalItem() {
     if (!signalInput.trim()) return
-    const temp: SignalItem = {
-      id: `temp-${Date.now()}`,
-      title: signalInput.trim(),
-      completed: false,
-    }
+    const temp: SignalItem = { id: `temp-${Date.now()}`, title: signalInput.trim(), completed: false }
     setLocalSignal((prev) => [...prev, temp])
     setSignalInput('')
     setShowSignalInput(false)
-
-    startTransition(() => {
-      addSignalItemAction(temp.title, today.dateStr)
-    })
+    startTransition(() => { addSignalItemAction(temp.title, today.dateStr) })
   }
 
   function toggleSignal(id: string, current: boolean) {
-    setLocalSignal((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, completed: !current } : s))
-    )
-    startTransition(() => {
-      toggleSignalItemAction(id, !current)
-    })
+    setLocalSignal((prev) => prev.map((s) => (s.id === id ? { ...s, completed: !current } : s)))
+    startTransition(() => { toggleSignalItemAction(id, !current) })
   }
 
   function deleteSignal(id: string) {
     setLocalSignal((prev) => prev.filter((s) => s.id !== id))
-    startTransition(() => {
-      deleteSignalItemAction(id)
-    })
+    startTransition(() => { deleteSignalItemAction(id) })
   }
 
   function handleMassCountBlur() {
     const val = parseInt(massCount) || 0
-    if (val > 0) {
-      const prev = outreach?.mass_count ?? 0
-      if (val !== prev) {
-        // Also mark the habit as complete if count > 0
-        if (!optimisticCompleted.has('mass_outreach')) {
-          setOptimisticCompleted((prev) => new Set([...prev, 'mass_outreach']))
-          startTransition(() => {
-            toggleHabitAction('mass_outreach', today.dateStr)
-          })
-        }
-        startTransition(() => {
-          updateVouchOutreachAction(today.dateStr, val, undefined)
-        })
+    if (val > 0 && val !== (outreach?.mass_count ?? 0)) {
+      if (!optimisticCompleted.has('mass_outreach')) {
+        setOptimisticCompleted((prev) => new Set([...prev, 'mass_outreach']))
+        startTransition(() => { toggleHabitAction('mass_outreach', today.dateStr) })
       }
+      startTransition(() => { updateVouchOutreachAction(today.dateStr, val, undefined) })
     }
   }
 
@@ -177,82 +148,84 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
     if (personalisedName !== (outreach?.personalised_name ?? '')) {
       if (personalisedName.trim() && !optimisticCompleted.has('personalised_outreach')) {
         setOptimisticCompleted((prev) => new Set([...prev, 'personalised_outreach']))
-        startTransition(() => {
-          toggleHabitAction('personalised_outreach', today.dateStr)
-        })
+        startTransition(() => { toggleHabitAction('personalised_outreach', today.dateStr) })
       }
-      startTransition(() => {
-        updateVouchOutreachAction(today.dateStr, undefined, personalisedName.trim())
-      })
+      startTransition(() => { updateVouchOutreachAction(today.dateStr, undefined, personalisedName.trim()) })
     }
   }
 
   const byCategory = CATEGORY_ORDER.reduce<Record<HabitCategory, HabitDefinition[]>>(
-    (acc, cat) => {
-      acc[cat] = habits.filter((h) => h.category === cat)
-      return acc
-    },
+    (acc, cat) => { acc[cat] = habits.filter((h) => h.category === cat); return acc },
     { morning: [], vouch: [], body: [], mind: [], partner: [] }
   )
 
-  const dayBadgeVariant =
-    today.type === 'office' ? 'default' : today.type === 'rest' ? 'secondary' : 'outline'
+  const dayBadgeColor = today.type === 'office' ? 'bg-white text-black' : today.type === 'rest' ? 'bg-white/10 text-white/60' : 'bg-white/10 text-white/80'
 
   return (
-    <div className="min-h-screen max-w-lg mx-auto px-4 pb-24">
+    <div className="min-h-screen bg-black max-w-lg mx-auto px-5 pb-32">
 
       {/* ── Header ── */}
-      <div className="pt-10 pb-6 space-y-4">
+      <div className="pt-10 pb-8 space-y-5">
         <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">The Work</h1>
-            <p className="text-muted-foreground text-sm mt-0.5">{today.displayDate}</p>
+          <div className="space-y-0.5">
+            <h1 className="text-3xl font-black uppercase tracking-tight text-white">The Work.</h1>
+            <p className="text-white/40 text-sm font-medium">{today.displayDate}</p>
           </div>
-          <div className="flex items-center gap-2 mt-1">
-            <Badge variant={dayBadgeVariant}>{today.label}</Badge>
-            <Link href="/weekly" className="text-muted-foreground hover:text-foreground transition-colors" title="This week">
+          <div className="flex items-center gap-3 pt-1">
+            <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${dayBadgeColor}`}>
+              {today.label}
+            </span>
+            <Link href="/weekly" className="text-white/30 hover:text-white transition-colors">
               <BarChart2 className="h-5 w-5" />
             </Link>
           </div>
         </div>
 
-        {/* Push notification prompt */}
+        {/* Progress bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between items-baseline">
+            <span className="text-xs font-bold uppercase tracking-wider text-white/40">
+              Today
+            </span>
+            <span className="text-xs font-bold text-white/40">{doneCount}/{totalHabits}</span>
+          </div>
+          <div className="h-1 bg-white/8 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Principle */}
+        <div className="border-l-2 border-primary pl-4 py-0.5">
+          <p className="text-sm text-white/60 leading-relaxed italic">&ldquo;{principle.text}&rdquo;</p>
+          <p className="text-xs text-white/30 mt-1">— {principle.source}</p>
+        </div>
+
+        {/* Push prompt */}
         {pushEnabled === false && (
           <button
             onClick={enablePush}
             disabled={pushLoading}
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors"
           >
             <Bell className="h-3.5 w-3.5" />
             {pushLoading ? 'Enabling...' : 'Enable daily reminders'}
           </button>
         )}
-
-        {/* Progress */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{doneCount} of {totalHabits} habits done</span>
-            <span>{progressPct}%</span>
-          </div>
-          <Progress value={progressPct} className="h-1.5" />
-        </div>
-
-        {/* Principle of the day */}
-        <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1">
-          <p className="text-sm leading-relaxed text-muted-foreground italic">&ldquo;{principle.text}&rdquo;</p>
-          <p className="text-xs text-muted-foreground/60">— {principle.source}</p>
-        </div>
       </div>
 
       {/* ── Signal Section ── */}
-      <section className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Zap className="h-4 w-4 text-amber-500" />
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-amber-500">
-            Signal — Mission Critical
+      <section className="mb-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Zap className="h-4 w-4 text-primary" fill="currentColor" />
+          <h2 className="text-xs font-black uppercase tracking-widest text-primary">
+            Signal
           </h2>
+          <span className="text-xs text-white/20 ml-auto">Mission critical</span>
           {localSignal.length > 0 && (
-            <span className="ml-auto text-xs text-muted-foreground">
+            <span className="text-xs font-bold text-white/30">
               {signalDone}/{localSignal.length}
             </span>
           )}
@@ -260,32 +233,32 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
 
         <div className="space-y-2">
           {localSignal.length === 0 && !showSignalInput && (
-            <p className="text-sm text-muted-foreground px-1">
-              No signal items yet. What&apos;s mission critical today?
+            <p className="text-sm text-white/30 px-1">
+              What&apos;s mission critical today?
             </p>
           )}
 
           {localSignal.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-3 group"
+              className="flex items-center gap-3 bg-white/4 border border-white/8 rounded-lg px-4 py-3.5 group"
             >
               <button
                 onClick={() => toggleSignal(item.id, item.completed)}
-                className={`flex-shrink-0 h-5 w-5 rounded border-2 flex items-center justify-center transition-colors ${
+                className={`flex-shrink-0 h-5 w-5 rounded border-2 flex items-center justify-center transition-all ${
                   item.completed
-                    ? 'bg-amber-500 border-amber-500'
-                    : 'border-amber-500/50 hover:border-amber-500'
+                    ? 'bg-primary border-primary'
+                    : 'border-primary/60 hover:border-primary'
                 }`}
               >
-                {item.completed && <Check className="h-3 w-3 text-black" />}
+                {item.completed && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
               </button>
-              <span className={`flex-1 text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}>
+              <span className={`flex-1 text-sm font-medium ${item.completed ? 'line-through text-white/30' : 'text-white'}`}>
                 {item.title}
               </span>
               <button
                 onClick={() => deleteSignal(item.id)}
-                className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive"
+                className="opacity-0 group-hover:opacity-100 transition-opacity text-white/20 hover:text-white/60"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -294,7 +267,7 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
 
           {showSignalInput ? (
             <div className="flex gap-2">
-              <Input
+              <input
                 ref={signalInputRef}
                 value={signalInput}
                 onChange={(e) => setSignalInput(e.target.value)}
@@ -303,16 +276,20 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
                   if (e.key === 'Escape') setShowSignalInput(false)
                 }}
                 placeholder="What's mission critical today?"
-                className="h-10 text-sm"
+                className="flex-1 h-11 bg-white/5 border border-white/10 rounded-lg px-4 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-primary transition-colors"
               />
-              <Button size="sm" onClick={addSignalItem} disabled={!signalInput.trim()}>
+              <button
+                onClick={addSignalItem}
+                disabled={!signalInput.trim()}
+                className="h-11 px-4 bg-primary disabled:opacity-30 rounded-lg text-sm font-bold text-white"
+              >
                 Add
-              </Button>
+              </button>
             </div>
           ) : (
             <button
               onClick={() => setShowSignalInput(true)}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-amber-500 transition-colors px-1 py-1"
+              className="flex items-center gap-2 text-sm text-white/30 hover:text-primary transition-colors px-1 py-1.5"
             >
               <Plus className="h-4 w-4" />
               Add signal item
@@ -323,24 +300,24 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
 
       {/* ── Habit Sections ── */}
       {today.type === 'rest' ? (
-        <div className="rounded-lg border border-border bg-card px-4 py-6 text-center space-y-2">
-          <p className="font-medium">Sunday — Rest.</p>
-          <p className="text-sm text-muted-foreground">
-            Recovery is part of the system. Set your Signal list for Monday.
+        <div className="border border-white/8 rounded-xl p-6 text-center space-y-3">
+          <p className="font-black uppercase tracking-tight text-lg">Sunday. Rest.</p>
+          <p className="text-sm text-white/40">
+            Recovery is part of the system. Plan your Signal list for Monday.
           </p>
-          <Link href="/evening" className="text-sm text-primary underline underline-offset-4 inline-block mt-2">
-            Plan tomorrow &rarr;
+          <Link href="/evening" className="inline-block text-sm font-bold text-primary mt-2">
+            Plan tomorrow →
           </Link>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div className="space-y-7">
           {CATEGORY_ORDER.map((cat) => {
             const catHabits = byCategory[cat]
             if (catHabits.length === 0) return null
 
             return (
               <section key={cat}>
-                <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">
+                <h2 className="text-xs font-black uppercase tracking-widest text-white/25 mb-3">
                   {CATEGORY_LABELS[cat]}
                 </h2>
                 <div className="space-y-2">
@@ -350,18 +327,18 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
                     if (cat === 'vouch' && habit.key === 'mass_outreach') {
                       return (
                         <HabitCard key={habit.key} habit={habit} done={done} onToggle={toggleHabit}>
-                          {done || massCount ? (
-                            <div className="flex items-center gap-2 mt-2 ml-8">
-                              <Input
+                          {(done || massCount) ? (
+                            <div className="flex items-center gap-3 mt-3 ml-8">
+                              <input
                                 type="number"
                                 min="0"
                                 value={massCount}
                                 onChange={(e) => setMassCount(e.target.value)}
                                 onBlur={handleMassCountBlur}
                                 placeholder="0"
-                                className="h-7 w-20 text-xs"
+                                className="h-8 w-20 bg-white/5 border border-white/10 rounded px-3 text-xs text-white focus:outline-none focus:border-primary"
                               />
-                              <span className="text-xs text-muted-foreground">outreaches today</span>
+                              <span className="text-xs text-white/30">outreaches today</span>
                             </div>
                           ) : null}
                         </HabitCard>
@@ -371,14 +348,14 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
                     if (cat === 'vouch' && habit.key === 'personalised_outreach') {
                       return (
                         <HabitCard key={habit.key} habit={habit} done={done} onToggle={toggleHabit}>
-                          {done || personalisedName ? (
-                            <div className="flex items-center gap-2 mt-2 ml-8">
-                              <Input
+                          {(done || personalisedName) ? (
+                            <div className="mt-3 ml-8">
+                              <input
                                 value={personalisedName}
                                 onChange={(e) => setPersonalisedName(e.target.value)}
                                 onBlur={handlePersonalisedNameBlur}
                                 placeholder="Who did you reach out to?"
-                                className="h-7 text-xs"
+                                className="w-full h-8 bg-white/5 border border-white/10 rounded px-3 text-xs text-white placeholder:text-white/25 focus:outline-none focus:border-primary"
                               />
                             </div>
                           ) : null}
@@ -389,7 +366,7 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
                     return (
                       <HabitCard key={habit.key} habit={habit} done={done} onToggle={toggleHabit}>
                         {habit.key === 'exercise' && today.showLunchExercise && !done && (
-                          <p className="text-xs text-amber-500 ml-8 mt-1">Lunch today — office day</p>
+                          <p className="text-xs text-primary ml-8 mt-1.5 font-medium">Lunch today — office day</p>
                         )}
                       </HabitCard>
                     )
@@ -401,16 +378,16 @@ export function HomeClient({ today, principle, habits, completedKeys, signalItem
         </div>
       )}
 
-      {/* ── Evening check-in CTA ── */}
+      {/* ── Evening CTA ── */}
       {isAfter5pm && (
-        <div className="fixed bottom-6 left-0 right-0 px-4 max-w-lg mx-auto">
+        <div className="fixed bottom-6 left-0 right-0 px-5 max-w-lg mx-auto">
           <Link href="/evening">
-            <div className="rounded-xl border border-border bg-card/90 backdrop-blur px-4 py-3 flex items-center justify-between shadow-lg">
+            <div className="bg-primary rounded-xl px-5 py-4 flex items-center justify-between shadow-2xl">
               <div>
-                <p className="font-medium text-sm">Evening check-in</p>
-                <p className="text-xs text-muted-foreground">Did you eat the frog?</p>
+                <p className="font-black uppercase tracking-tight text-white text-sm">Evening check-in</p>
+                <p className="text-xs text-white/70 mt-0.5">Did you eat the frog?</p>
               </div>
-              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              <ChevronRight className="h-5 w-5 text-white" />
             </div>
           </Link>
         </div>
@@ -431,32 +408,26 @@ function HabitCard({
   children?: React.ReactNode
 }) {
   return (
-    <div
-      className={`rounded-lg border bg-card px-3 py-3 transition-colors ${
-        done ? 'border-border/50 opacity-60' : 'border-border'
-      }`}
-    >
+    <div className={`rounded-lg border transition-all ${done ? 'border-white/4 bg-white/2 opacity-50' : 'border-white/8 bg-white/4'}`}>
       <button
         onClick={() => onToggle(habit.key)}
-        className="flex items-start gap-3 w-full text-left"
+        className="flex items-start gap-3 w-full text-left px-4 py-3.5"
       >
-        <div
-          className={`flex-shrink-0 mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center transition-colors ${
-            done ? 'bg-primary border-primary' : 'border-muted-foreground/40 hover:border-primary'
-          }`}
-        >
-          {done && <Check className="h-3 w-3 text-primary-foreground" />}
+        <div className={`flex-shrink-0 mt-0.5 h-5 w-5 rounded border-2 flex items-center justify-center transition-all ${
+          done ? 'bg-primary border-primary' : 'border-white/20 hover:border-primary/60'
+        }`}>
+          {done && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
         </div>
         <div className="flex-1 min-w-0">
-          <p className={`text-sm font-medium leading-tight ${done ? 'line-through text-muted-foreground' : ''}`}>
+          <p className={`text-sm font-semibold leading-tight ${done ? 'line-through text-white/25' : 'text-white'}`}>
             {habit.label}
           </p>
           {!done && (
-            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{habit.why}</p>
+            <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{habit.why}</p>
           )}
         </div>
       </button>
-      {children}
+      {children && <div className="px-4 pb-3.5">{children}</div>}
     </div>
   )
 }

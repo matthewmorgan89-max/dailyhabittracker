@@ -3,10 +3,6 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Flame, Users } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
 import { saveWeeklyReflectionAction } from '@/app/actions'
 import type { DayInfo } from '@/lib/day'
 import type { HabitDefinition } from '@/lib/habits'
@@ -58,58 +54,55 @@ export function WeeklyClient({
   }
 
   const byCategory = CATEGORY_ORDER.reduce<Record<string, HabitDefinition[]>>(
-    (acc, cat) => {
-      acc[cat] = habits.filter((h) => h.category === cat)
-      return acc
-    },
-    {}
+    (acc, cat) => { acc[cat] = habits.filter((h) => h.category === cat); return acc }, {}
   )
 
-  const pctColor =
-    weekPct >= 80 ? 'text-emerald-400' : weekPct >= 50 ? 'text-amber-400' : 'text-muted-foreground'
+  const pctColor = weekPct >= 80 ? 'text-primary' : weekPct >= 50 ? 'text-white' : 'text-white/40'
+  const pctMessage = weekPct >= 80
+    ? 'Exceptional. Keep this standard.'
+    : weekPct >= 60
+    ? 'Solid. Finish strong.'
+    : weekPct >= 40
+    ? 'What one habit would move this number?'
+    : 'The week isn\'t over. What\'s one change today?'
 
   return (
-    <div className="min-h-screen max-w-lg mx-auto px-4 pb-24">
+    <div className="min-h-screen bg-black max-w-lg mx-auto px-5 pb-24">
+
       {/* Header */}
-      <div className="pt-10 pb-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+      <div className="pt-10 pb-8 space-y-5">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-white/30 hover:text-white transition-colors">
             <ArrowLeft className="h-5 w-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">This Week</h1>
-            <p className="text-muted-foreground text-sm">{weekLabel}</p>
+            <h1 className="text-3xl font-black uppercase tracking-tight">This Week.</h1>
+            <p className="text-white/40 text-sm">{weekLabel}</p>
           </div>
         </div>
 
-        {/* Overall completion */}
-        <div className="rounded-lg border border-border bg-card px-4 py-4 space-y-2">
-          <div className="flex items-baseline gap-2">
-            <span className={`text-4xl font-bold tabular-nums ${pctColor}`}>{weekPct}%</span>
-            <span className="text-muted-foreground text-sm">habit completion so far</span>
+        {/* Big % */}
+        <div className="space-y-3">
+          <div className="flex items-baseline gap-3">
+            <span className={`text-6xl font-black tabular-nums ${pctColor}`}>{weekPct}%</span>
+            <span className="text-white/30 text-sm">completion</span>
           </div>
-          <Progress value={weekPct} className="h-1.5" />
-          <p className="text-xs text-muted-foreground">
-            {weekPct >= 80
-              ? 'Exceptional week. Keep this standard.'
-              : weekPct >= 60
-              ? 'Solid. A few more days to finish strong.'
-              : weekPct >= 40
-              ? 'Middle of the pack. What\'s the one habit that would move this?'
-              : 'The week isn\'t over. What\'s one thing you\'ll do differently today?'}
-          </p>
+          <div className="h-1 bg-white/8 rounded-full overflow-hidden">
+            <div className="h-full bg-primary rounded-full transition-all duration-700" style={{ width: `${weekPct}%` }} />
+          </div>
+          <p className="text-xs text-white/40">{pctMessage}</p>
         </div>
       </div>
 
-      {/* Habit Grids by Category */}
-      <div className="space-y-6 mb-8">
+      {/* Habits by category */}
+      <div className="space-y-7 mb-10">
         {CATEGORY_ORDER.map((cat) => {
           const catHabits = byCategory[cat]
           if (!catHabits?.length) return null
 
           return (
             <section key={cat}>
-              <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+              <h2 className="text-xs font-black uppercase tracking-widest text-white/25 mb-3">
                 {CATEGORY_LABELS[cat as keyof typeof CATEGORY_LABELS]}
               </h2>
               <div className="space-y-2">
@@ -121,66 +114,50 @@ export function WeeklyClient({
                   const daysDone = applies.filter((a, i) => a && completed.has(weekDays[i])).length
 
                   return (
-                    <div key={habit.key} className="rounded-lg border border-border bg-card px-3 py-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="text-sm font-medium leading-tight">{habit.label}</span>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <div key={habit.key} className="bg-white/4 border border-white/8 rounded-lg px-4 py-3">
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <span className="text-sm font-semibold text-white">{habit.label}</span>
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           {streak > 0 && (
-                            <Badge variant="secondary" className="text-xs gap-1 px-1.5">
-                              <Flame className="h-3 w-3 text-amber-400" />
+                            <span className="flex items-center gap-1 text-xs font-bold text-primary">
+                              <Flame className="h-3 w-3" />
                               {streak}d
-                            </Badge>
+                            </span>
                           )}
-                          <span className="text-xs text-muted-foreground">
-                            {daysDone}/{daysApplicable}
-                          </span>
+                          <span className="text-xs text-white/25">{daysDone}/{daysApplicable}</span>
                         </div>
                       </div>
 
                       {/* Week dots */}
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-1">
                         {weekDays.map((day, i) => {
                           const isToday = day === today.dateStr
                           const isFuture = day > today.dateStr
                           const doesApply = applies[i]
                           const isDone = completed.has(day)
 
-                          if (!doesApply) {
-                            return (
-                              <div key={day} className="flex flex-col items-center gap-0.5 flex-1">
-                                <span className="text-[10px] text-muted-foreground/40">{DAY_LABELS[i]}</span>
-                                <div className="h-5 w-5 flex items-center justify-center">
-                                  <div className="h-0.5 w-2 bg-muted-foreground/20 rounded" />
-                                </div>
-                              </div>
-                            )
-                          }
+                          if (!doesApply) return (
+                            <div key={day} className="flex flex-col items-center gap-1 flex-1">
+                              <span className="text-[10px] text-white/15">{DAY_LABELS[i]}</span>
+                              <div className="h-1 w-full bg-white/8 rounded-full" />
+                            </div>
+                          )
 
-                          if (isFuture) {
-                            return (
-                              <div key={day} className="flex flex-col items-center gap-0.5 flex-1">
-                                <span className="text-[10px] text-muted-foreground/40">{DAY_LABELS[i]}</span>
-                                <div className="h-5 w-5 rounded-full border border-muted-foreground/20" />
-                              </div>
-                            )
-                          }
+                          if (isFuture) return (
+                            <div key={day} className="flex flex-col items-center gap-1 flex-1">
+                              <span className="text-[10px] text-white/15">{DAY_LABELS[i]}</span>
+                              <div className="h-4 w-4 mx-auto rounded-full border border-white/10" />
+                            </div>
+                          )
 
                           return (
-                            <div key={day} className="flex flex-col items-center gap-0.5 flex-1">
-                              <span className={`text-[10px] ${isToday ? 'text-foreground font-medium' : 'text-muted-foreground/40'}`}>
+                            <div key={day} className="flex flex-col items-center gap-1 flex-1">
+                              <span className={`text-[10px] font-bold ${isToday ? 'text-white' : 'text-white/15'}`}>
                                 {DAY_LABELS[i]}
                               </span>
-                              <div
-                                className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                  isDone
-                                    ? 'bg-primary border-primary'
-                                    : isToday
-                                    ? 'border-primary/50'
-                                    : 'border-muted-foreground/30'
-                                }`}
-                              >
-                                {isDone && <div className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
-                              </div>
+                              <div className={`h-4 w-4 mx-auto rounded-full transition-colors ${
+                                isDone ? 'bg-primary' : isToday ? 'border-2 border-primary/40' : 'border border-white/15'
+                              }`} />
                             </div>
                           )
                         })}
@@ -196,55 +173,51 @@ export function WeeklyClient({
 
       {/* Social Energy */}
       <section className="mb-8 space-y-3">
-        <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" />
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Social Energy
-          </h2>
+        <div>
+          <h2 className="text-xs font-black uppercase tracking-widest text-white/25 mb-1">Social Energy</h2>
+          <p className="text-lg font-black uppercase tracking-tight">Real social time?</p>
         </div>
-        <div
+        <button
           onClick={() => setSocialDone(!socialDone)}
-          className={`rounded-lg border cursor-pointer px-4 py-4 transition-colors space-y-1 ${
-            socialDone ? 'border-primary/50 bg-primary/5' : 'border-border bg-card'
+          className={`w-full rounded-xl border px-5 py-4 text-left transition-all space-y-1 ${
+            socialDone ? 'border-primary bg-primary/10' : 'border-white/8 bg-white/4'
           }`}
         >
           <div className="flex items-center gap-3">
-            <div
-              className={`h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                socialDone ? 'bg-primary border-primary' : 'border-muted-foreground/40'
-              }`}
-            >
-              {socialDone && <div className="h-2 w-2 rounded-sm bg-primary-foreground" />}
+            <div className={`h-5 w-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
+              socialDone ? 'bg-primary border-primary' : 'border-white/20'
+            }`}>
+              {socialDone && <div className="h-2 w-2 rounded-sm bg-white" />}
             </div>
-            <p className="text-sm font-medium">Real social time this week</p>
+            <p className="text-sm font-bold text-white">Friend, hobby, or face-to-face meeting</p>
           </div>
-          <p className="text-xs text-muted-foreground ml-8">
-            Friend catch-up, hobby, or face-to-face meeting instead of a call.
-            You&apos;re an extrovert — isolation is a performance drain, not a discipline badge.
+          <p className="text-xs text-white/30 ml-8">
+            You&apos;re an extrovert. Isolation is a performance drain, not a discipline badge.
           </p>
-        </div>
+        </button>
       </section>
 
       {/* Reflection */}
       <section className="mb-8 space-y-3">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Weekly Reflection
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          What moved this week? What slipped? What&apos;s the one thing to double down on next week?
-        </p>
-        <Textarea
+        <div>
+          <h2 className="text-xs font-black uppercase tracking-widest text-white/25 mb-1">Weekly Reflection</h2>
+          <p className="text-lg font-black uppercase tracking-tight">What moved? What slipped?</p>
+        </div>
+        <textarea
           value={reflection}
           onChange={(e) => setReflection(e.target.value)}
-          placeholder="Write it here. Honesty > performance."
-          className="text-sm resize-none"
+          placeholder="Honesty > performance. What's the one thing to double down on next week?"
+          className="w-full bg-white/4 border border-white/8 rounded-xl px-4 py-3.5 text-sm text-white placeholder:text-white/20 resize-none focus:outline-none focus:border-primary transition-colors"
           rows={4}
         />
       </section>
 
-      <Button onClick={handleSave} className="w-full h-11">
-        {saved ? 'Saved' : 'Save reflection'}
-      </Button>
+      <button
+        onClick={handleSave}
+        className="w-full h-14 bg-primary rounded-xl font-black uppercase tracking-wide text-white text-sm"
+      >
+        {saved ? 'Saved ✓' : 'Save reflection →'}
+      </button>
     </div>
   )
 }

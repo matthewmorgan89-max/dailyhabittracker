@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 
 export default function AuthPage() {
   const [email, setEmail] = useState('')
@@ -33,22 +31,31 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">The Work</h1>
-          <p className="text-muted-foreground text-sm">
+    <div className="min-h-screen bg-black flex flex-col px-6 py-10">
+
+      {/* Logo */}
+      <div>
+        <span className="text-sm font-black uppercase tracking-widest text-white">The Work.</span>
+      </div>
+
+      {/* Main content — pushed to lower third */}
+      <div className="flex-1 flex flex-col justify-end pb-16 space-y-10">
+
+        <div className="space-y-3">
+          <h1 className="text-5xl font-black uppercase leading-none tracking-tight text-white">
+            Stop making<br />excuses.
+          </h1>
+          <p className="text-muted-foreground text-base">
             Your daily discipline OS.
           </p>
         </div>
 
         {sent ? (
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="font-medium text-sm">Check your email</p>
+          <div className="space-y-6">
+            <div className="border border-white/10 rounded-lg p-5 space-y-1">
+              <p className="font-bold text-sm">Check your email</p>
               <p className="text-muted-foreground text-sm">
-                We sent a magic link to <span className="text-foreground">{email}</span>.
-                Click it to sign in.
+                Sent a link to <span className="text-white">{email}</span>. Click it to get in.
               </p>
             </div>
             <button
@@ -59,34 +66,28 @@ export default function AuthPage() {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Email
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoFocus
-                className="h-11"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus
+              className="w-full h-14 bg-white/5 border border-white/10 rounded-lg px-4 text-white placeholder:text-white/30 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+            />
 
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
 
-            <Button
+            <button
               type="submit"
-              className="w-full h-11"
               disabled={loading || !email}
+              className="w-full h-14 bg-primary hover:bg-primary/90 disabled:opacity-40 rounded-lg font-bold text-white text-base uppercase tracking-wide transition-colors"
             >
-              {loading ? 'Sending...' : 'Send magic link'}
-            </Button>
+              {loading ? 'Sending...' : 'Let me in →'}
+            </button>
           </form>
         )}
       </div>
