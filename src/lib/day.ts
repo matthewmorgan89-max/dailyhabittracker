@@ -1,5 +1,16 @@
 import { format, getDayOfYear } from 'date-fns'
 
+/**
+ * Returns the current date as a Date object anchored to midnight,
+ * using the wall-clock date in the given timezone (defaults to Sydney).
+ * Fixes server-side UTC vs local timezone mismatch on Vercel.
+ */
+export function getLocalDate(tz = 'Australia/Sydney'): Date {
+  // en-CA locale gives YYYY-MM-DD format reliably
+  const dateStr = new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date())
+  return new Date(dateStr + 'T00:00:00')
+}
+
 export const RELATIONSHIP_PROMPTS = [
   { label: 'Tell someone specifically what they mean to you', why: "Not just 'love you' — say exactly why. Specificity is what lands." },
   { label: 'Call or message someone you haven\'t spoken to in a month', why: 'Relationships atrophy without investment. One touch keeps the thread alive.' },
@@ -17,7 +28,7 @@ export const RELATIONSHIP_PROMPTS = [
   { label: 'Share a meal or coffee with someone who energises you', why: 'You\'re an extrovert. Time with the right people is fuel, not distraction.' },
 ]
 
-export function getRelationshipPromptOfDay(date: Date = new Date()) {
+export function getRelationshipPromptOfDay(date: Date = getLocalDate()) {
   const idx = getDayOfYear(date) % RELATIONSHIP_PROMPTS.length
   return RELATIONSHIP_PROMPTS[idx]
 }
@@ -34,7 +45,7 @@ export interface DayInfo {
   showLunchExercise: boolean
 }
 
-export function getDayInfo(date: Date = new Date()): DayInfo {
+export function getDayInfo(date: Date = getLocalDate()): DayInfo {
   const dow = date.getDay() // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
 
   let type: DayType
@@ -99,7 +110,7 @@ const PRINCIPLES = [
   { text: 'Stoicism is not about suppressing emotion. It\'s about not being controlled by it.', source: 'Ryan Holiday' },
 ]
 
-export function getPrincipleOfDay(date: Date = new Date()) {
+export function getPrincipleOfDay(date: Date = getLocalDate()) {
   const idx = getDayOfYear(date) % PRINCIPLES.length
   return PRINCIPLES[idx]
 }

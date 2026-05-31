@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { getDayInfo, getPrincipleOfDay, getRelationshipPromptOfDay } from '@/lib/day'
+import { getDayInfo, getPrincipleOfDay, getRelationshipPromptOfDay, getLocalDate } from '@/lib/day'
 import { getHabitsForDay } from '@/lib/habits'
 import { detectCoachingInsight } from '@/lib/coaching'
 import { HomeClient } from '@/components/HomeClient'
@@ -10,13 +10,15 @@ export default async function HomePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  const today = getDayInfo()
-  const principle = getPrincipleOfDay()
-  const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd')
-  const fourteenDaysAgo = format(subDays(new Date(), 14), 'yyyy-MM-dd')
+  // Use Sydney wall-clock date so the app doesn't show yesterday before 10am
+  const nowInSydney = getLocalDate()
+  const today = getDayInfo(nowInSydney)
+  const principle = getPrincipleOfDay(nowInSydney)
+  const yesterday = format(subDays(nowInSydney, 1), 'yyyy-MM-dd')
+  const fourteenDaysAgo = format(subDays(nowInSydney, 14), 'yyyy-MM-dd')
 
   // Inject today's rotating relationship prompt into the habit definition
-  const relationshipPrompt = getRelationshipPromptOfDay()
+  const relationshipPrompt = getRelationshipPromptOfDay(nowInSydney)
   const habits = getHabitsForDay(today.type).map((h) =>
     h.key === 'relationship'
       ? { ...h, label: relationshipPrompt.label, why: relationshipPrompt.why }
