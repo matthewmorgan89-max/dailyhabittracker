@@ -391,6 +391,7 @@ footer button:hover{color:var(--terra)}
 .shead .eyebrow{display:block;margin-bottom:16px}
 .shead .h2{margin-bottom:16px}
 .shead .lede{max-width:560px}
+.shead .lede + .lede{margin-top:16px}
 
 /* ============ PRINT ============ */
 .printonly{display:none}
@@ -486,11 +487,32 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 2 — GUT CHECK ======== -->
+<!-- ======== SCREEN 2 — YOUR OWN IDEAS ======== -->
 <section class="screen" id="s2">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">02 · Gut check</span>
+      <span class="eyebrow">02 · Your own ideas</span>
+      <h2 class="h2">Before anything else, what would you do?</h2>
+      <p class="lede">In a minute you'll see four options that have already been written up. But the best one might be something nobody has thought of yet, and it's much easier to hear your own idea before you've read anyone else's.</p>
+      <p class="lede">So here are two blank slots. There are no rules and nothing is too ambitious. If nothing comes to mind, skip straight past and carry on. You can always come back later.</p>
+    </div>
+    <div id="ideaslots"></div>
+    <div class="actions">
+      <button class="btn" onclick="go(3)" id="ideasnextbtn">Now show me the options</button>
+    </div>
+    <a class="backlink" href="javascript:go(1)">← Your north star</a>
+    <div class="quote">
+      <p class="q">"Everything is figureoutable."</p>
+      <p class="a">Marie Forleo</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 3 — GUT CHECK ======== -->
+<section class="screen" id="s3">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">03 · Gut check</span>
       <h2 class="h2">Your gut goes first.</h2>
       <p class="lede">You've been living with this for months, which means you already know things you haven't put into words yet. Write them down before you read anyone else's opinion. Afterwards you'll see where your instinct agrees with the analysis and where the two part company, and that gap is usually where the interesting stuff is hiding.</p>
     </div>
@@ -498,7 +520,7 @@ footer button:hover{color:var(--terra)}
     <div class="actions">
       <button class="btn terra" id="unlockbtn" disabled onclick="unlock()">Show me what you think</button>
     </div>
-    <a class="backlink" href="javascript:go(1)">← Your north star</a>
+    <a class="backlink" href="javascript:go(2)">← Your own ideas</a>
     <div class="quote" id="unlockquote" style="display:none">
       <p class="q">"Don't be intimidated by what you don't know. That can be your greatest strength and ensure that you do things differently from everyone else."</p>
       <p class="a">Sara Blakely</p>
@@ -506,11 +528,11 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 3 — WRITE-UPS ======== -->
-<section class="screen" id="s3">
+<!-- ======== SCREEN 4 — WRITE-UPS ======== -->
+<section class="screen" id="s4">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">03 · The write-ups</span>
+      <span class="eyebrow">04 · The write-ups</span>
       <h2 class="h2">Here's what we think.</h2>
       <p class="scorenote" style="text-align:left;margin-top:4px">Treat these scores as opinions rather than maths. If one of them annoys you, that's useful information. Argue with it.</p>
     </div>
@@ -524,36 +546,17 @@ footer button:hover{color:var(--terra)}
       <p><strong>And here are two ideas that aren't on the list yet.</strong></p>
       <p><strong>What if you open Brisbane but don't stay there?</strong> Build it, train the team properly, hand your patients over, and then live in Sydney, flying back once a month. That might be the version that gets you both things at once.</p>
       <p><strong>What if the patients you leave behind are worth something?</strong> You've assumed that 70 per cent move with you and the rest simply vanish. But the remaining book, the location and the systems might be worth selling rather than writing off.</p>
-      <p class="spark">Blank slots below if either of those sparks something.</p>
+      <p class="spark">If either of those sparks something, your blank slots are still there and still editable.</p>
+      <p style="margin-top:18px"><button class="btn ghost" style="background:rgba(250,246,238,.1);color:#F6EFDE;border-color:rgba(246,239,222,.35)" onclick="go(2)">Go back and add an idea</button></p>
     </div>
 
-    <div class="actions">
-      <button class="btn" onclick="go(4)">What if it's none of these?</button>
-    </div>
-    <a class="backlink" href="javascript:go(2)">← Your gut scores</a>
-    <div class="quote">
-      <p class="q">"Talk to yourself like you would to someone you love."</p>
-      <p class="a">Brené Brown</p>
-    </div>
-  </div>
-</section>
-
-<!-- ======== SCREEN 4 — YOUR OWN IDEAS ======== -->
-<section class="screen" id="s4">
-  <div class="wrap">
-    <div class="shead">
-      <span class="eyebrow">04 · Your own ideas</span>
-      <h2 class="h2">What if it's none of these?</h2>
-      <p class="lede">The best option might be one nobody has written down yet, including us. Two blank slots, no rules, nothing too ambitious. Just dream a little.</p>
-    </div>
-    <div id="ideaslots"></div>
     <div class="actions">
       <button class="btn" onclick="go(5)">See everything side by side</button>
     </div>
-    <a class="backlink" href="javascript:go(3)">← The write-ups</a>
+    <a class="backlink" href="javascript:go(3)">← Your gut scores</a>
     <div class="quote">
-      <p class="q">"Everything is figureoutable."</p>
-      <p class="a">Marie Forleo</p>
+      <p class="q">"Talk to yourself like you would to someone you love."</p>
+      <p class="a">Brené Brown</p>
     </div>
   </div>
 </section>
@@ -571,7 +574,7 @@ footer button:hover{color:var(--terra)}
       <button class="btn terra" onclick="go(6)">How do I feel about this?</button>
       <button class="btn ghost" onclick="window.print()">Save as PDF</button>
     </div>
-    <a class="backlink" href="javascript:go(4)">← Your own ideas</a>
+    <a class="backlink" href="javascript:go(4)">← The write-ups</a>
     <div class="quote">
       <p class="q">"Clear is kind. Unclear is unkind."</p>
       <p class="a">Brené Brown</p>
@@ -782,7 +785,8 @@ const IDEA_QS=[
  {key:'a7', label:'What would make you walk away, and by when?'}
 ];
 
-const DEFAULT_NS="Buy our dream house in Byron Bay (~$12m), with a good work/life balance, no ceiling on my earnings, and full control over my commercial interests.";
+const DEFAULT_NS="Buy your dream house in Byron Bay (~$12m), with a good work/life balance, no ceiling on your earnings, and full control over your commercial interests.";
+const DEFAULT_NS_MINE="Buy my dream house in Byron Bay (~$12m), with a good work/life balance, no ceiling on my earnings, and full control over my commercial interests.";
 
 /* ================= STATE ================= */
 const KEY='byron-plan-v1';
@@ -842,8 +846,8 @@ function render(){
   bar.classList.toggle('visible',state.screen>=1);
   renderNsBar();
   if(state.screen===1)requestAnimationFrame(()=>autoGrow(document.getElementById('nstext')));
-  if(state.screen===2)renderGutState();
-  if(state.screen===3)renderWriteups();
+  if(state.screen===3)renderGutState();
+  if(state.screen===4)renderWriteups();
   if(state.screen===5)renderRank();
   if(state.screen===6)renderFeel();
   if(state.screen===7)renderClaude();
@@ -944,7 +948,7 @@ function renderGutState(){
 function unlock(){
   state.unlocked=true;save();
   document.getElementById('unlockquote').style.display='block';
-  go(3);
+  go(4);
 }
 
 /* ================= SCREEN 3 — WRITE-UPS ================= */
@@ -1012,7 +1016,8 @@ function buildIdeas(){
   const host=document.getElementById('ideaslots');
   host.innerHTML=state.ideas.map((idea,i)=>`
     <div class="card ideaslot">
-      <div class="slotlabel">Blank slot ${i===0?'one':'two'} · yours</div>
+      <div class="slotlabel">Your idea ${i===0?'one':'two'} · optional</div>
+      ${i===1?'<p class="fieldhint" style="margin:-6px 0 4px">Only if you have a second one in you. One is plenty.</p>':''}
       ${IDEA_QS.map((q,qi)=>`
         <div class="field" ${qi===0?'style="margin-top:6px"':''}>
           <label class="fieldlabel">${q.label}</label>
@@ -1160,7 +1165,8 @@ function buildPrompt(){
   L.push("the brainstorming stage, so help me see the potential as well as the problems.");
   L.push("");
   L.push("MY GOAL");
-  if(state.northStar.trim())L.push(state.northStar.trim());
+  const goal=state.northStar.trim();
+  if(goal)L.push(goal===DEFAULT_NS?DEFAULT_NS_MINE:goal);
   if(state.targetYear)L.push("I want to be standing on that deck by "+state.targetYear+".");
   L.push("");
   L.push("ABOUT ME");
