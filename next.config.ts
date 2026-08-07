@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/byron',
+        destination: '/byron.html',
+      },
+    ]
+  },
   async headers() {
     return [
       {

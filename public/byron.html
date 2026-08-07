@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Byron Plan</title>
+<meta name="theme-color" content="#FAF6EE">
+<style>
+/* ============ FOUNDATION ============ */
+:root{
+  --paper:#FAF6EE;
+  --paper-warm:#F4EDDE;
+  --sand:#E9DFCB;
+  --sand-deep:#D9C9A8;
+  --ocean:#1C3A43;
+  --ocean-soft:#2E4E58;
+  --ocean-mist:#5E7A82;
+  --ink:#233238;
+  --ink-soft:#4A5A5F;
+  --terra:#C06A4B;
+  --terra-soft:#D08A6E;
+  --terra-wash:#F3E2D8;
+  --gold:#B99B62;
+  --hairline:rgba(28,58,67,.14);
+  --shadow:0 20px 60px -24px rgba(28,58,67,.28);
+  --serif:"Didot","Bodoni 72","Playfair Display","Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Segoe UI",Arial,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.65;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+h1,h2,h3,.serif{font-family:var(--serif);font-weight:400;letter-spacing:.01em}
+em{font-style:italic}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:16px;color:var(--ink)}
+::placeholder{color:#9AA8AB;opacity:1}
+
+.eyebrow{
+  font-family:var(--sans);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--terra);font-weight:600;
+}
+.eyebrow.ocean{color:var(--ocean-mist)}
+
+/* ============ SCREENS ============ */
+.screen{display:none;min-height:100vh;padding:0 0 80px}
+.screen.active{display:block;animation:screenIn .65s cubic-bezier(.22,.8,.3,1) both}
+@keyframes screenIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.wrap{max-width:680px;margin:0 auto;padding:0 22px}
+
+/* ============ NORTH STAR BAR ============ */
+#nsbar{
+  display:none;position:sticky;top:0;z-index:50;
+  background:rgba(250,246,238,.88);
+  -webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);
+  border-bottom:1px solid var(--hairline);
+  cursor:pointer;
+}
+#nsbar.visible{display:block}
+#nsbar .inner{max-width:680px;margin:0 auto;padding:10px 22px 12px;display:flex;align-items:center;gap:12px}
+#nsbar .star{color:var(--gold);font-size:14px;flex:none}
+#nsbar .txt{
+  font-family:var(--serif);font-size:13.5px;color:var(--ocean);line-height:1.4;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  flex:1;
+}
+#nsbar .yr{font-size:11px;letter-spacing:.14em;color:var(--terra);font-weight:600;flex:none}
+#nsprogress{height:2px;background:transparent;position:relative}
+#nsprogress .fill{position:absolute;left:0;top:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--terra));transition:width .8s cubic-bezier(.22,.8,.3,1)}
+
+/* north star editor sheet */
+#nsedit{
+  display:none;position:fixed;inset:0;z-index:100;
+  background:rgba(28,58,67,.4);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);
+  align-items:flex-end;justify-content:center;
+}
+#nsedit.open{display:flex;animation:fadeIn .3s both}
+#nsedit .sheet{
+  background:var(--paper);width:100%;max-width:680px;border-radius:22px 22px 0 0;
+  padding:28px 24px calc(28px + env(safe-area-inset-bottom));
+  animation:sheetUp .4s cubic-bezier(.22,.8,.3,1) both;
+}
+@keyframes sheetUp{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+#nsedit textarea{width:100%;min-height:96px}
+#nsedit .row{display:flex;gap:12px;margin-top:14px;align-items:center}
+
+/* ============ TYPE SCALE ============ */
+.display{font-size:clamp(34px,8.5vw,54px);line-height:1.12;color:var(--ocean)}
+.h2{font-size:clamp(27px,6.5vw,38px);line-height:1.18;color:var(--ocean)}
+.h3{font-size:22px;line-height:1.25;color:var(--ocean)}
+.lede{font-size:17.5px;color:var(--ink-soft);line-height:1.7}
+.small{font-size:13.5px;color:var(--ink-soft)}
+
+/* ============ QUOTE ============ */
+.quote{
+  margin:64px auto 0;max-width:520px;text-align:center;padding:0 10px;
+}
+.quote:before{content:"";display:block;width:34px;height:1px;background:var(--gold);margin:0 auto 22px}
+.quote .q{font-family:var(--serif);font-size:19px;font-style:italic;color:var(--ocean-soft);line-height:1.5}
+.quote .a{margin-top:12px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
+
+/* ============ BUTTONS ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--ocean);color:var(--paper);
+  font-size:13px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;
+  padding:19px 40px;border-radius:999px;
+  transition:all .35s ease;box-shadow:0 14px 34px -14px rgba(28,58,67,.5);
+}
+.btn:hover{background:var(--ocean-soft);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.35;cursor:not-allowed;box-shadow:none;transform:none}
+.btn.terra{background:var(--terra)}
+.btn.terra:hover{background:var(--terra-soft)}
+.btn.ghost{background:transparent;color:var(--ocean);border:1px solid var(--hairline);box-shadow:none}
+.btn.ghost:hover{border-color:var(--ocean-mist);background:rgba(28,58,67,.04)}
+.btn.wide{width:100%}
+.backlink{
+  display:inline-flex;align-items:center;gap:8px;margin:34px 0 0;
+  font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;
+  transition:color .3s;
+}
+.backlink:hover{color:var(--terra)}
+.actions{margin-top:48px;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+
+/* ============ CARDS ============ */
+.card{
+  background:#FFFDF8;border:1px solid var(--hairline);border-radius:18px;
+  padding:28px 24px;box-shadow:0 8px 30px -18px rgba(28,58,67,.18);
+}
+
+/* ============ SCREEN 0 — WELCOME ============ */
+#s0{
+  display:none;min-height:100vh;position:relative;overflow:hidden;
+  background:
+    radial-gradient(120% 85% at 85% -5%, #F6E7D2 0%, transparent 55%),
+    radial-gradient(110% 80% at 0% 100%, #DCE4E0 0%, transparent 52%),
+    radial-gradient(90% 60% at 50% 115%, rgba(46,78,88,.32) 0%, transparent 60%),
+    linear-gradient(178deg,#FBF4E6 0%,#F3E4CD 34%,#EAD3B4 58%,#D8BC9C 78%,#B99C86 100%);
+}
+#s0.active{display:flex;align-items:center;justify-content:center}
+#s0 .sun{
+  position:absolute;width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(214,140,90,.5),rgba(214,140,90,0) 68%);
+  top:6%;right:-90px;pointer-events:none;
+}
+#s0 .inner{position:relative;text-align:center;padding:80px 26px;max-width:600px}
+#s0 .mark{font-family:var(--serif);font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--ocean-soft);margin-bottom:56px}
+#s0 h1{margin-bottom:30px}
+#s0 .lede{max-width:460px;margin:0 auto}
+#s0 .lede + .lede{margin-top:18px}
+#s0 .btn{margin-top:48px}
+
+/* ============ SLIDERS ============ */
+.sliderblock{padding:22px 0;border-bottom:1px solid var(--hairline)}
+.sliderblock:last-child{border-bottom:none}
+.sliderblock .top{display:flex;justify-content:space-between;align-items:baseline;gap:14px}
+.sliderblock .name{font-family:var(--serif);font-size:19px;color:var(--ocean)}
+.sliderblock .val{font-family:var(--serif);font-size:22px;color:var(--terra);min-width:30px;text-align:right}
+.sliderblock .desc{font-size:13.5px;color:var(--ink-soft);margin-top:3px;line-height:1.55}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:38px;background:transparent;margin-top:8px;
+}
+input[type=range]::-webkit-slider-runnable-track{
+  height:3px;border-radius:2px;
+  background:linear-gradient(90deg,var(--terra) var(--pct,50%),var(--sand-deep) var(--pct,50%));
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:26px;height:26px;border-radius:50%;
+  background:var(--paper);border:1.5px solid var(--terra);
+  box-shadow:0 3px 10px rgba(28,58,67,.22);margin-top:-11.5px;
+}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--sand-deep)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--terra)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:var(--paper);border:1.5px solid var(--terra);box-shadow:0 3px 10px rgba(28,58,67,.22)}
+
+/* ============ INPUTS ============ */
+.textin,textarea{
+  width:100%;background:#FFFDF8;border:1px solid var(--hairline);border-radius:12px;
+  padding:14px 16px;transition:border-color .3s;line-height:1.55;
+}
+.textin:focus,textarea:focus{outline:none;border-color:var(--terra-soft)}
+textarea{resize:vertical;min-height:76px}
+.fieldlabel{font-family:var(--serif);font-size:18.5px;color:var(--ocean);line-height:1.4;display:block;margin-bottom:4px}
+.fieldhint{font-size:13px;color:var(--ink-soft);margin-bottom:10px;font-style:italic}
+.field{margin-top:26px}
+
+/* ============ GUT CARDS (Screen 2) ============ */
+.gutcard{margin-top:22px;position:relative;overflow:hidden}
+.gutcard .num{font-family:var(--serif);font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px}
+.gutcard h3{margin-bottom:6px}
+.gutcard .oneline{font-size:14px;color:var(--ink-soft);font-style:italic;line-height:1.6}
+.gutcard .lockrow{
+  margin-top:16px;padding:13px 16px;border-radius:12px;
+  background:linear-gradient(100deg,rgba(233,223,203,.55),rgba(233,223,203,.25));
+  border:1px dashed rgba(28,58,67,.18);
+  display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);
+}
+.gutcard .gutq{margin-top:20px;font-family:var(--serif);font-size:17px;color:var(--ocean)}
+.gutcard .gutval{font-family:var(--serif);font-size:30px;color:var(--terra);text-align:center;min-height:40px;line-height:40px}
+.gutcard .gutval .of{font-size:14px;color:var(--ink-soft)}
+.gutcard .whyq{margin-top:12px;font-size:13.5px;color:var(--ink-soft);margin-bottom:8px}
+.gutcard.scored{border-color:rgba(185,155,98,.5)}
+.gutcard .donetick{
+  position:absolute;top:20px;right:20px;width:26px;height:26px;border-radius:50%;
+  background:var(--terra-wash);color:var(--terra);display:none;align-items:center;justify-content:center;font-size:13px;
+}
+.gutcard.scored .donetick{display:flex}
+
+/* ============ WRITE-UP CARDS (Screen 3) ============ */
+.wcard{margin-top:26px;position:relative;border-radius:18px;overflow:hidden}
+.wcard .frost{
+  position:absolute;inset:0;z-index:5;border-radius:18px;
+  background:rgba(250,246,238,.55);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+  color:var(--ocean-mist);transition:opacity .9s ease;
+}
+.wcard.unlocked .frost{opacity:0;pointer-events:none}
+.wcard .frost .lock{font-size:22px}
+.wcard .frost .locktxt{font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:600}
+.wcard .body{transition:opacity .7s ease .15s}
+.wcard.revealing .body{animation:cardExpand .8s cubic-bezier(.22,.8,.3,1) both}
+@keyframes cardExpand{from{opacity:0;transform:scale(.97) translateY(10px)}to{opacity:1;transform:none}}
+.wcard .num{font-family:var(--serif);font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px}
+.wcard h3{margin-bottom:10px;font-size:24px}
+.wcard .oneline{font-size:14.5px;color:var(--ink-soft);font-style:italic;line-height:1.65;padding-bottom:18px;border-bottom:1px solid var(--hairline)}
+
+.scorebars{margin:20px 0 4px}
+.sbar{display:grid;grid-template-columns:1fr 44px;gap:10px;align-items:center;padding:7px 0}
+.sbar .lab{font-size:12.5px;color:var(--ink-soft);letter-spacing:.02em}
+.sbar .track{grid-column:1/2;height:5px;border-radius:3px;background:var(--sand);overflow:hidden;margin-top:3px}
+.sbar .fill{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--ocean-soft),var(--ocean-mist));transition:width 1.1s cubic-bezier(.25,.8,.3,1)}
+.sbar.hi .fill{background:linear-gradient(90deg,var(--terra),var(--terra-soft))}
+.sbar .n{grid-column:2;grid-row:1/3;font-family:var(--serif);font-size:19px;color:var(--ocean);text-align:right}
+
+.wtotal{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+  margin:16px 0 4px;padding:14px 18px;border-radius:12px;background:var(--paper-warm);
+}
+.wtotal .lab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.wtotal .n{font-family:var(--serif);font-size:30px;color:var(--ocean)}
+.wtotal .n .of{font-size:14px;color:var(--ink-soft)}
+
+.wsec{margin-top:24px}
+.wsec .sect{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--terra);font-weight:600;margin-bottom:10px}
+.wsec ul{list-style:none}
+.wsec li{position:relative;padding-left:20px;margin-bottom:10px;font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+.wsec li:before{content:"";position:absolute;left:2px;top:10px;width:6px;height:6px;border-radius:50%;background:var(--sand-deep)}
+.wsec.brill li:before{background:var(--gold)}
+.wsec p{font-size:14.5px;color:var(--ink-soft);line-height:1.7}
+.wsec.heart p{font-family:var(--serif);font-size:16.5px;color:var(--ocean-soft);line-height:1.7}
+.wsec.sitting{
+  background:var(--terra-wash);border-radius:12px;padding:18px 20px;margin-top:26px;
+}
+.wsec.sitting .sect{margin-bottom:6px}
+.wsec.sitting p{color:#8A4E36;font-style:italic}
+
+.badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+  padding:10px 16px;border-radius:999px;font-size:12.5px;font-weight:600;line-height:1.4;
+}
+.badge.up{background:#F3E2D8;color:#A5542F}
+.badge.down{background:#E4E9E3;color:#4A6A52}
+.badge.agree{background:var(--paper-warm);color:var(--ocean-mist)}
+
+.scorenote{font-size:12.5px;color:var(--ink-soft);font-style:italic;text-align:center;margin-top:18px}
+
+/* noticed callout */
+.noticed{
+  margin-top:44px;border-radius:18px;overflow:hidden;
+  background:linear-gradient(150deg,var(--ocean) 0%,#254852 60%,#2E5560 100%);
+  color:#EAE3D3;padding:34px 26px;box-shadow:var(--shadow);
+}
+.noticed .sect{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:16px}
+.noticed p{font-size:15px;line-height:1.75;color:rgba(234,227,211,.86);margin-bottom:14px}
+.noticed p strong{color:#F6EFDE;font-weight:600}
+.noticed p:last-child{margin-bottom:0}
+.noticed .spark{font-style:italic;color:var(--sand-deep);font-size:13.5px}
+
+/* ============ IDEA SLOTS (Screen 4) ============ */
+.ideaslot{margin-top:26px}
+.ideaslot .slotlabel{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:14px}
+.ideaslot textarea.big{min-height:120px}
+.ideaslot .gutmini{margin-top:26px;padding-top:20px;border-top:1px solid var(--hairline)}
+
+/* ============ COMPARISON (Screen 5) ============ */
+.rankcard{margin-top:20px;position:relative}
+.rankcard .rankrow{display:flex;align-items:baseline;gap:14px}
+.rankcard .pos{font-family:var(--serif);font-size:15px;color:var(--gold);min-width:24px}
+.rankcard h3{font-size:20px;flex:1}
+.rankcard .scores{display:flex;gap:22px;margin:14px 0 4px;padding-left:38px}
+.rankcard .scr .n{font-family:var(--serif);font-size:30px;color:var(--ocean)}
+.rankcard .scr .n .of{font-size:13px;color:var(--ink-soft)}
+.rankcard .scr .l{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.rankcard .scr.gut .n{color:var(--terra)}
+.rankcard .minibars{padding-left:38px;margin-top:8px}
+.rankcard .minibars .sbar{padding:4px 0}
+.rankcard .minibars .sbar .lab{font-size:11.5px}
+.rankcard .minibars .sbar .n{font-size:15px}
+.rankcard .minibars .sbar .fill{transition:width .8s ease}
+.rankcard.ready{border-style:dashed}
+.readychip{
+  display:inline-flex;align-items:center;gap:8px;margin:10px 0 4px 38px;
+  padding:9px 16px;border-radius:999px;background:var(--paper-warm);
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ocean-mist);font-weight:600;
+}
+.pastenote{margin:8px 0 0 38px;font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+
+/* ============ FEELINGS (Screen 6) ============ */
+.feelq{margin-top:34px}
+.feelq .qnum{font-family:var(--serif);font-size:13px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px}
+.feelq h3{margin-bottom:4px}
+.feelq .hint{font-size:13.5px;color:var(--ink-soft);font-style:italic;margin-bottom:14px}
+.feelq.coin{
+  background:linear-gradient(160deg,#FFFDF8,var(--paper-warm));
+  border:1px solid rgba(185,155,98,.4);border-radius:18px;padding:28px 24px;
+  box-shadow:0 12px 40px -20px rgba(28,58,67,.25);
+}
+.feelq.coin h3{font-size:24px}
+.pickgrid{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.pick{
+  text-align:left;padding:15px 18px;border-radius:12px;border:1px solid var(--hairline);
+  background:#FFFDF8;font-size:15px;color:var(--ink);line-height:1.45;
+  transition:all .3s ease;display:flex;align-items:center;gap:12px;
+}
+.pick .dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--sand-deep);flex:none;transition:all .3s}
+.pick:hover{border-color:var(--ocean-mist)}
+.pick.sel{border-color:var(--terra);background:var(--terra-wash)}
+.pick.sel .dot{border-color:var(--terra);background:var(--terra);box-shadow:inset 0 0 0 3.5px var(--terra-wash)}
+.scaretoggle{display:flex;gap:10px;margin-top:12px}
+.scaretoggle .pick{flex:1;justify-content:center;text-align:center}
+
+.closing{
+  margin-top:48px;border-radius:20px;padding:40px 28px;text-align:center;
+  background:linear-gradient(155deg,var(--ocean) 0%,#27505C 100%);color:var(--paper);
+  box-shadow:var(--shadow);display:none;
+  animation:screenIn .8s cubic-bezier(.22,.8,.3,1) both;
+}
+.closing.show{display:block}
+.closing .eyebrow{color:var(--gold);margin-bottom:18px;display:block}
+.closing h2{color:#F6EFDE;font-size:clamp(28px,7vw,40px);margin-bottom:20px}
+.closing p{color:rgba(234,227,211,.82);font-size:15.5px;line-height:1.75;max-width:440px;margin:0 auto}
+.closing p + p{margin-top:14px}
+
+/* ============ CLAUDE (Screen 7) ============ */
+.steps{margin-top:26px}
+.step{display:flex;gap:16px;margin-bottom:18px}
+.step .sn{
+  font-family:var(--serif);font-size:17px;color:var(--terra);
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--terra-soft);
+  display:flex;align-items:center;justify-content:center;flex:none;
+}
+.step p{font-size:14.5px;color:var(--ink-soft);padding-top:4px;line-height:1.6}
+#copybtn{position:relative;overflow:hidden}
+#copybtn .tick{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--gold);opacity:0;transform:translateY(100%);transition:all .45s cubic-bezier(.22,.8,.3,1);
+}
+#copybtn.copied .tick{opacity:1;transform:none}
+#copybtn .tick svg{width:18px;height:18px}
+#copybtn .tick svg path{stroke-dasharray:24;stroke-dashoffset:24}
+#copybtn.copied .tick svg path{animation:tickdraw .5s .2s ease forwards}
+@keyframes tickdraw{to{stroke-dashoffset:0}}
+.showprompt{margin-top:18px;text-align:center}
+.showprompt button{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ocean-mist);font-weight:600;text-decoration:underline;text-underline-offset:4px}
+#promptreveal{
+  display:none;margin-top:18px;background:var(--ocean);color:#D7E2DC;border-radius:14px;
+  padding:22px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
+  line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:420px;overflow-y:auto;
+}
+#promptreveal.open{display:block}
+.pasteback{margin-top:30px}
+
+/* ============ FOOTER ============ */
+footer{padding:70px 22px 60px;text-align:center}
+footer .sep{width:34px;height:1px;background:var(--sand-deep);margin:0 auto 24px}
+footer button{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+footer button:hover{color:var(--terra)}
+
+/* ============ SCREEN HEADERS ============ */
+.shead{padding:56px 0 8px}
+.shead .eyebrow{display:block;margin-bottom:16px}
+.shead .h2{margin-bottom:16px}
+.shead .lede{max-width:560px}
+
+/* ============ PRINT ============ */
+.printonly{display:none}
+@media print{
+  body{background:#fff}
+  #nsbar,#nsedit,footer,.actions,.backlink,.quote,.btn,.noscreen-print{display:none !important}
+  .screen{display:none !important}
+  #s5.printable,#s6.printable{display:block !important;animation:none;padding:0}
+  .printonly{display:block;page-break-before:always}
+  .card,.rankcard{box-shadow:none;break-inside:avoid}
+  .closing{background:#fff;color:var(--ink);border:1px solid var(--hairline);box-shadow:none}
+  .closing h2,.closing p{color:var(--ink)}
+}
+
+@media(min-width:640px){
+  .actions{flex-direction:row;justify-content:center}
+  .card{padding:34px 34px}
+  .noticed{padding:40px 38px}
+}
+</style>
+</head>
+<body>
+
+<!-- ======== NORTH STAR BAR ======== -->
+<div id="nsbar" role="button" aria-label="Edit your north star" onclick="openNsEdit()">
+  <div class="inner">
+    <span class="star">✦</span>
+    <span class="txt" id="nsbartxt"></span>
+    <span class="yr" id="nsbaryr"></span>
+  </div>
+  <div id="nsprogress"><div class="fill" id="nsprogressfill"></div></div>
+</div>
+
+<!-- north star editor -->
+<div id="nsedit" onclick="if(event.target===this)closeNsEdit()">
+  <div class="sheet">
+    <span class="eyebrow">Your north star</span>
+    <h3 class="h3" style="margin:10px 0 16px">Edit it from anywhere. It's yours.</h3>
+    <textarea id="nsedittext" oninput="onNsEditInput()"></textarea>
+    <div class="row">
+      <label class="small" for="nsedityear" style="flex:none">On that deck by</label>
+      <input class="textin" style="max-width:110px" id="nsedityear" type="number" inputmode="numeric" placeholder="year" oninput="onNsEditInput()">
+      <button class="btn" style="margin-left:auto;padding:14px 28px" onclick="closeNsEdit()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== SCREEN 0 — WELCOME ======== -->
+<section class="screen" id="s0">
+  <div class="sun"></div>
+  <div class="inner">
+    <div class="mark">The Byron Plan</div>
+    <h1 class="display">Let's get Byron out of your head and onto a screen.</h1>
+    <p class="lede" style="margin-top:30px">Every option you've been turning over, in one place. About 25 minutes. Nothing here is a decision — it's a way of seeing what you already think.</p>
+    <p class="lede">No numbers. No homework. Your answers save as you go, so you can walk away and come back.</p>
+    <button class="btn terra" onclick="go(1)">Let's go</button>
+    <div class="quote">
+      <p class="q">"You are one decision away from a completely different life."</p>
+      <p class="a">Mel Robbins</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 1 — NORTH STAR ======== -->
+<section class="screen" id="s1">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">01 · Your north star</span>
+      <h2 class="h2">Where is all of this pointing?</h2>
+      <p class="lede">In your own words. Change anything — it's pinned to the top of every screen from here on, so every option gets judged against it.</p>
+    </div>
+    <div class="card" style="margin-top:26px">
+      <textarea id="nstext" class="serif" style="font-family:var(--serif);font-size:20px;line-height:1.55;color:var(--ocean);min-height:150px;border:none;background:transparent;padding:4px 2px" oninput="onNsInput()"></textarea>
+    </div>
+    <div class="field">
+      <label class="fieldlabel" for="nsyear">When do you want to be standing on that deck?</label>
+      <input class="textin" style="max-width:140px" id="nsyear" type="number" inputmode="numeric" placeholder="year" oninput="onNsInput()">
+    </div>
+
+    <div class="shead" style="padding-top:52px">
+      <h2 class="h2" style="font-size:clamp(24px,6vw,32px)">What matters most to you?</h2>
+      <p class="lede" style="font-size:15.5px">Drag these around. There are no wrong answers and you can change them later.</p>
+    </div>
+    <div class="card" id="sliders" style="margin-top:20px;padding-top:10px;padding-bottom:10px"></div>
+
+    <div class="actions">
+      <button class="btn" onclick="go(2)">Now the options</button>
+    </div>
+    <div class="quote">
+      <p class="q">"Life shrinks or expands in proportion to one's courage."</p>
+      <p class="a">Anaïs Nin</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 2 — GUT CHECK ======== -->
+<section class="screen" id="s2">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">02 · Gut check</span>
+      <h2 class="h2">Your gut goes first.</h2>
+      <p class="lede">You've been thinking about this for months — you already know things you haven't put into words. Get them down before you read anyone else's take. We'll show you afterwards where your instinct and the thinking line up, and where they don't. That gap is usually the interesting bit.</p>
+    </div>
+    <div id="gutcards"></div>
+    <div class="actions">
+      <button class="btn terra" id="unlockbtn" disabled onclick="unlock()">Show me what you think</button>
+    </div>
+    <a class="backlink" href="javascript:go(1)">← Your north star</a>
+    <div class="quote" id="unlockquote" style="display:none">
+      <p class="q">"Don't be intimidated by what you don't know. That can be your greatest strength and ensure that you do things differently from everyone else."</p>
+      <p class="a">Sara Blakely</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 3 — WRITE-UPS ======== -->
+<section class="screen" id="s3">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">03 · The write-ups</span>
+      <h2 class="h2">Here's what we think.</h2>
+      <p class="scorenote" style="text-align:left;margin-top:4px">These scores are opinions, not maths. They're here to start an argument, not finish one. Disagree freely.</p>
+    </div>
+    <div id="wcards"></div>
+
+    <div class="noticed">
+      <div class="sect">Something we noticed</div>
+      <p><strong>Options 1, 3 and 4 aren't really three different lives. They're the same life in three different orders.</strong></p>
+      <p>Clinic income funds Postur. Postur. gives the clinic a brand and a ceiling. Sydney is where both end up. So the question probably isn't "which one" — it's "which first, and how quickly do you move to the next."</p>
+      <p>That's a much nicer question. It means you're not giving anything up.</p>
+      <p><strong>And two ideas nobody's put on the list yet:</strong></p>
+      <p><strong>What if you open Brisbane but don't stay there?</strong> Build it, train them properly, hand your patients over — and then be in Sydney, going back once a month. It might be the version that gets you both things.</p>
+      <p><strong>What if the patients you don't take with you are worth something?</strong> You've assumed 70% moves and the rest disappears. The remaining book, the location, the systems — that might be a sale rather than a write-off.</p>
+      <p class="spark">Blank slots below if either of those sparks something.</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn" onclick="go(4)">What if it's none of these?</button>
+    </div>
+    <a class="backlink" href="javascript:go(2)">← Your gut scores</a>
+    <div class="quote">
+      <p class="q">"Talk to yourself like you would to someone you love."</p>
+      <p class="a">Brené Brown</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 4 — YOUR OWN IDEAS ======== -->
+<section class="screen" id="s4">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">04 · Your own ideas</span>
+      <h2 class="h2">What if it's none of these?</h2>
+      <p class="lede">The best option might be one nobody's written down yet — including us. Two blank slots, no rules, nothing too ambitious. Blue sky.</p>
+    </div>
+    <div id="ideaslots"></div>
+    <div class="actions">
+      <button class="btn" onclick="go(5)">See everything side by side</button>
+    </div>
+    <a class="backlink" href="javascript:go(3)">← The write-ups</a>
+    <div class="quote">
+      <p class="q">"Everything is figureoutable."</p>
+      <p class="a">Marie Forleo</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 5 — SIDE BY SIDE ======== -->
+<section class="screen" id="s5">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">05 · Everything, side by side</span>
+      <h2 class="h2">The whole picture.</h2>
+      <p class="lede">Ranked by what matters most to you — with your gut score alongside, so the gaps stay visible.</p>
+    </div>
+    <div id="rankcards"></div>
+    <div class="actions">
+      <button class="btn terra" onclick="go(6)">How do I feel about this?</button>
+      <button class="btn ghost" onclick="window.print()">Save as PDF</button>
+    </div>
+    <a class="backlink" href="javascript:go(4)">← Your own ideas</a>
+    <div class="quote">
+      <p class="q">"Clear is kind. Unclear is unkind."</p>
+      <p class="a">Brené Brown</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 6 — HOW DO YOU FEEL ======== -->
+<section class="screen" id="s6">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">06 · How do you feel?</span>
+      <h2 class="h2">Now the actual question.</h2>
+      <p class="lede">You've seen everything. Scores are just scores — this is what matters.</p>
+    </div>
+
+    <div class="feelq">
+      <div class="qnum">I</div>
+      <h3 class="h3">Which one do you want to be true?</h3>
+      <p class="hint">Pick one — not the best one, the one you want.</p>
+      <div class="pickgrid" id="feel1"></div>
+    </div>
+
+    <div class="feelq coin" style="margin-top:44px">
+      <div class="qnum">II</div>
+      <h3 class="h3">If you woke up tomorrow and it was already decided, which one would you hope it was?</h3>
+      <p class="hint">Don't think. Answer.</p>
+      <div class="pickgrid" id="feel2"></div>
+    </div>
+
+    <div class="feelq">
+      <div class="qnum">III</div>
+      <h3 class="h3">Which one would you be relieved to never think about again?</h3>
+      <div class="pickgrid" id="feel3"></div>
+    </div>
+
+    <div class="feelq">
+      <div class="qnum">IV</div>
+      <h3 class="h3">What's the one thing that scares you about your top pick?</h3>
+      <textarea id="feel4" style="margin-top:10px" placeholder="Say it plainly…" oninput="onFeel4Input()"></textarea>
+      <p class="hint" style="margin-top:14px;margin-bottom:8px">And does it scare you because it's wrong, or because it's big?</p>
+      <div class="scaretoggle" id="feel4b"></div>
+    </div>
+
+    <div class="closing" id="closingcard">
+      <span class="eyebrow">Where you landed</span>
+      <h2 id="closingpick"></h2>
+      <p>Not decided. Not signed. But that's where your head and your gut both went, and you got there yourself in under half an hour.</p>
+      <p>Nothing here is locked. Come back and change it whenever you like — that's what it's for.</p>
+    </div>
+
+    <div class="actions" id="s6actions">
+      <button class="btn" id="toclaudebtn" onclick="go(7)" style="display:none">Send your ideas to Claude</button>
+      <button class="btn ghost" onclick="window.print()">Save as PDF</button>
+    </div>
+    <a class="backlink" href="javascript:go(5)">← Side by side</a>
+    <div class="quote">
+      <p class="q">"You get in life what you have the courage to ask for."</p>
+      <p class="a">Oprah Winfrey</p>
+    </div>
+  </div>
+</section>
+
+<!-- ======== SCREEN 7 — SEND TO CLAUDE ======== -->
+<section class="screen" id="s7">
+  <div class="wrap">
+    <div class="shead">
+      <span class="eyebrow">07 · Optional — entirely up to you</span>
+      <h2 class="h2">Want your own ideas looked at properly?</h2>
+      <p class="lede">The four original options were written up before you opened this. Your ideas are brand new — nothing's had a look at them yet.</p>
+    </div>
+    <div class="card" style="margin-top:26px">
+      <span class="eyebrow ocean">Three steps, two minutes</span>
+      <div class="steps" style="margin-top:18px">
+        <div class="step"><div class="sn">1</div><p>Press the button. It copies everything you've written.</p></div>
+        <div class="step"><div class="sn">2</div><p>Open Claude, start a new chat, paste it in (Cmd+V).</p></div>
+        <div class="step"><div class="sn">3</div><p>Claude sends back a write-up. Copy it, come back, paste it in the box below.</p></div>
+      </div>
+      <p class="small" style="font-style:italic">Nothing to sign up for. Totally optional — you can skip this and it still works.</p>
+      <div class="actions" style="margin-top:26px">
+        <button class="btn terra wide" id="copybtn" onclick="copyPrompt()">
+          Copy everything
+          <span class="tick">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6.5" stroke="#FAF6EE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Copied
+          </span>
+        </button>
+      </div>
+      <div class="showprompt">
+        <button onclick="togglePrompt()" id="showpromptbtn">Show me what I'm sending</button>
+      </div>
+      <div id="promptreveal"></div>
+    </div>
+
+    <div id="pastebacks"></div>
+
+    <div class="actions">
+      <button class="btn" onclick="go(5)">Back to the comparison</button>
+    </div>
+    <a class="backlink" href="javascript:go(6)">← How you feel</a>
+  </div>
+</section>
+
+<footer>
+  <div class="sep"></div>
+  <button onclick="startOver()">Start over</button>
+</footer>
+
+<script>
+/* ================= DATA ================= */
+const AXES=[
+  {key:'grow',   name:'Room to grow',          desc:'Can this get you to Byron, or does it top out somewhere below?'},
+  {key:'money',  name:'Money soon',            desc:'How quickly is this paying you properly?'},
+  {key:'without',name:'Earns without you',     desc:'Does it make money while you sleep, or is it your hands and your hours?'},
+  {key:'built',  name:"Uses what you've built",desc:'Your patients, your brand, your name, your people — or starting fresh?'},
+  {key:'life',   name:'The life you want, now',desc:'Sydney, settled, together — and out of 12-hour days.'},
+  {key:'landing',name:'Soft landing',          desc:"If it doesn't work, how easily do you recover? (High = safe.)"}
+];
+
+const OPTIONS=[
+{
+ id:1,
+ title:'Build the Brisbane clinic, then let it run without you',
+ oneline:"Stay in Brisbane long enough to open the hybrid chiro clinic × Postur. storefront, hire and train the chiropractors properly, and hand your own patients over to them. Once it's running, you're free — Postur., Sydney, and income arriving whether you're in the room or not. Sydney becomes site two, funded by a business that already works.",
+ scores:{grow:9,money:8,without:9,built:9,life:6,landing:7},
+ brilliant:[
+  "This is the only option that gets you out of 12-hour days <em>on purpose</em>. Handing your patients to your staff doesn't just keep the revenue — it converts your own labour into income that arrives without you. That's the whole game.",
+  "You start with roughly 70% of your patient base already in the building. Almost nothing else here starts with money coming in on day one.",
+  "The model is proven in your brother's clinic. You're improving something that works rather than inventing something that might.",
+  "Nick and Lana can walk into it. Money is far easier to raise for something people can see, and you've got a brand vision — the Technogym-storefront version — that nobody else in chiro is doing.",
+  "Once it's built and trained, you go to Sydney with a track record instead of a pitch deck. Site two is a much easier conversation than site one."
+ ],
+ solve:[
+  "The build-and-train phase means being properly present in Brisbane — the bit you're least keen on. Worth deciding upfront how long that actually is, so it has an end date rather than an open one.",
+  "Handing your patients to someone else is a real transition. It works, but it takes deliberate effort and a chiropractor good enough to hold them.",
+  "Money from friends is warm money. Lovely when it goes well, complicated when it doesn't. Worth agreeing what happens either way while everyone's excited."
+ ],
+ heart:"This is the option that solves the tiredness. Everything else on the list either keeps you working with your hands or asks you to start from nothing. This one takes the thing you've already built — your patients, your reputation, a model that works — and turns it into something that pays you while you're doing other things. The Brisbane time isn't a sentence, it's a build phase with a finish line: set it up, train them properly, hand over, go. And you arrive in Sydney with income behind you rather than starting again.",
+ sitting:"What's the date this stops being a Brisbane project and becomes a Sydney one? Not a guess — a date you'd hold yourself to."
+},
+{
+ id:2,
+ title:'Move to Sydney in January and build from there',
+ oneline:"Go as planned. Live at Matt's rent-free while you get your earnings back up. Build a Sydney patient base, and grow Postur. through digital and Matt's corporate contacts.",
+ scores:{grow:4,money:4,without:2,built:5,life:9,landing:8},
+ brilliant:[
+  "You get the life you want in January, with no conditions and nobody's permission. That's not a small thing — being settled and near family is half of what Byron is actually about.",
+  "Rent-free runway is a genuine gift. It buys you room to build something properly instead of taking whatever pays fastest.",
+  "The lowest-risk option here by a distance. No debt, no investors, nothing to lose but time.",
+  "Space and calm are underrated inputs. Some of the best thinking about Postur. might happen precisely because you're not running a clinic build at the same time."
+ ],
+ solve:[
+  "Nothing here earns without you. You'd be trading hours for money again, in a more expensive city — which is the pattern you're trying to break.",
+  "A Sydney patient book takes real time to get back to where you are now.",
+  "The Brisbane patient base and the investor conversation might not still be sitting there in eighteen months."
+ ],
+ heart:"This one buys the life first and works out the money afterwards — and that's a completely legitimate order to do things in. You'd be closer to family, properly settled, and free of a business build during a year that's already going to be busy. Just go into it clear-eyed: on its own it doesn't have a mechanism that reaches Byron, so it works best as a deliberate breathing year with something bigger planned behind it, rather than as the whole plan. Pick it knowing that and it's a strong choice.",
+ sitting:"If this is the one, what's the date you sit back down and ask what's next? Put it in the diary now and it stays a chapter rather than becoming the whole book."
+},
+{
+ id:3,
+ title:'Go straight to Sydney and build the clinic there',
+ oneline:"Same model as Brisbane, but skip the detour. Raise investment for a Sydney hybrid clinic × Postur. storefront and build it where you actually want to be.",
+ scores:{grow:9,money:5,without:7,built:6,life:8,landing:5},
+ brilliant:[
+  "Right city, right business model, no waiting. Everything you build is exactly where you'll need it.",
+  "Sydney is a better market for the Postur. storefront concept — higher spend, more appetite for a premium wellness brand, and the kind of clientele that turns a clinic into a name.",
+  "Same engine as Option 1: contractors at 50%, income that arrives without you. Just built somewhere you want to live.",
+  "You'd be starting the Byron fund and the Sydney life on the same day. There's real momentum in that."
+ ],
+ solve:[
+  "No patient base to open with, so the early months lean harder on marketing and referrals than they would in Brisbane.",
+  "Sydney rent and fit-out cost more, so the same build takes more backing.",
+  "Local investors tend to back local things. Worth an early, low-stakes conversation with Nick and Lana about whether Sydney changes anything for them."
+ ],
+ heart:"The right destination — the only question is order. This is Option 1's plan without the head start, and the head start is doing a lot of work in Option 1. But that assumes it has to be the full storefront from day one, and it might not. A smaller Sydney opening — two rooms, modest fit-out, Postur. as a corner rather than a flagship — gets you earning in the right city without betting everything on the launch, and grows into the bigger vision as it proves itself. That version of this option is a lot more interesting than the maximal one.",
+ sitting:"What's the smallest version of this that still excites you? Sometimes the scaled-down version is the one that actually happens."
+},
+{
+ id:4,
+ title:'Raise for Postur. and go all in',
+ oneline:"Take investment in Postur. and go full time on the brand. Lowest overheads, most freedom, live wherever you like, and get the product range moving properly.",
+ scores:{grow:10,money:3,without:6,built:6,life:8,landing:3},
+ brilliant:[
+  "The highest ceiling here by a mile. Equity in a product brand is the only genuinely uncapped thing on this list — clinics scale linearly, products don't.",
+  "Completely location-free. Sydney, Byron, anywhere. The business genuinely doesn't care where you are.",
+  "Your clinical credibility is a real moat. A postural product from a practising chiropractor is a completely different proposition to one from a marketer, and it's very hard to copy.",
+  "Your patients are your first market, your testing ground and your proof. Most founders would pay a fortune for that and can't buy it.",
+  "One thing, done properly, with all your attention on it. There's something clean about that."
+ ],
+ solve:[
+  "Investment isn't income — raising takes months before anything reaches you, and you'd be unpaid through it.",
+  "E-commerce growth is usually slower and more expensive than it looks from the outside.",
+  "Without clinical income there's no floor underneath a bad quarter."
+ ],
+ heart:"The most exciting option and the most exposed one. The ceiling is real — this is the only path here where the number genuinely has no limit. What's worth noticing is that it doesn't have to be an either/or. Almost every version of this that goes well has clinic income sitting quietly underneath it, paying the bills and buying patience while the brand finds its feet. Which suggests this might not be a competing option at all — it might be the chapter that follows Option 1 or 3, and being clear about that makes it more likely to happen, not less.",
+ sitting:"If the clinic were already running without you, would this be an obvious yes? If so, you're not choosing between them — you're choosing an order."
+}
+];
+
+const IDEA_QS=[
+ {key:'name', label:'Give it a name.', hint:"And describe it in one sentence you'd happily say out loud at a dinner party.", two:true},
+ {key:'a2', label:'Where do you live in this version — and what does a Tuesday look like?', hint:"Give this one room. It's the fun one.", big:true},
+ {key:'a3', label:'Who pays you, for what — and what are they spending that money on instead right now?'},
+ {key:'a4', label:"What does this use that you've already built?", hint:"Your patients, Postur., your brother's model, your network, Matt's contacts, your name."},
+ {key:'a5', label:"What would you need that you haven't got yet?"},
+ {key:'a6', label:"What's the cheapest, easiest thing you could do in the next month to find out if it's real?"},
+ {key:'a7', label:'What would make you walk away — and by when?'}
+];
+
+const DEFAULT_NS="Buy our dream house in Byron Bay (~$12m), with a good work/life balance, no ceiling on my earnings, and full control over my commercial interests.";
+
+/* ================= STATE ================= */
+const KEY='byron-plan-v1';
+let state={
+  screen:0,maxScreen:0,unlocked:false,revealPlayed:false,
+  northStar:DEFAULT_NS,targetYear:'',
+  weights:{grow:3,money:3,without:3,built:3,life:3,landing:3},
+  gut:{1:{score:0,why:''},2:{score:0,why:''},3:{score:0,why:''},4:{score:0,why:''}},
+  ideas:[
+    {name:'',one:'',a2:'',a3:'',a4:'',a5:'',a6:'',a7:'',gut:0,paste:''},
+    {name:'',one:'',a2:'',a3:'',a4:'',a5:'',a6:'',a7:'',gut:0,paste:''}
+  ],
+  feelings:{q1:'',q2:'',q3:'',q4:'',q4b:''}
+};
+
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw){const s=JSON.parse(raw);state=Object.assign(state,s);
+      state.weights=Object.assign({grow:3,money:3,without:3,built:3,life:3,landing:3},s.weights||{});
+    }
+  }catch(e){}
+}
+
+/* ================= SCORING ================= */
+function weightedScore(scores){
+  let num=0,den=0;
+  AXES.forEach(a=>{const w=state.weights[a.key]||0;num+=w*(scores[a.key]||0);den+=w});
+  if(den===0){AXES.forEach(a=>{num+=scores[a.key]||0;den+=1})}
+  return num/den;
+}
+function fmt1(n){return (Math.round(n*10)/10).toFixed(1).replace(/\.0$/,'')}
+function badgeFor(gut,weighted){
+  const d=gut-weighted;
+  if(d>1) return {cls:'up',txt:"You're more excited about this than the scores are — that's worth paying attention to"};
+  if(d<-1) return {cls:'down',txt:'You might be underselling this one'};
+  return {cls:'agree',txt:'You and the thinking are in agreement here'};
+}
+
+/* ================= NAVIGATION ================= */
+function go(n){
+  if(n===7 && !hasIdeas()){n=5}
+  state.screen=n;
+  if(n>state.maxScreen)state.maxScreen=n;
+  save();
+  render();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function hasIdeas(){return state.ideas.some(i=>i.name.trim().length>0)}
+
+function render(){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const sec=document.getElementById('s'+state.screen);
+  if(sec)sec.classList.add('active');
+  const bar=document.getElementById('nsbar');
+  bar.classList.toggle('visible',state.screen>=1);
+  renderNsBar();
+  if(state.screen===1)requestAnimationFrame(()=>autoGrow(document.getElementById('nstext')));
+  if(state.screen===2)renderGutState();
+  if(state.screen===3)renderWriteups();
+  if(state.screen===5)renderRank();
+  if(state.screen===6)renderFeel();
+  if(state.screen===7)renderClaude();
+}
+
+/* ================= NORTH STAR ================= */
+function renderNsBar(){
+  document.getElementById('nsbartxt').textContent=state.northStar;
+  document.getElementById('nsbaryr').textContent=state.targetYear?('· '+state.targetYear):'';
+  const pct=Math.min(100,Math.round(state.maxScreen/7*100));
+  document.getElementById('nsprogressfill').style.width=pct+'%';
+}
+function autoGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+4)+'px'}
+function onNsInput(){
+  autoGrow(document.getElementById('nstext'));
+  state.northStar=document.getElementById('nstext').value;
+  state.targetYear=document.getElementById('nsyear').value;
+  renderNsBar();save();
+}
+function openNsEdit(){
+  document.getElementById('nsedittext').value=state.northStar;
+  document.getElementById('nsedityear').value=state.targetYear;
+  document.getElementById('nsedit').classList.add('open');
+}
+function closeNsEdit(){document.getElementById('nsedit').classList.remove('open')}
+function onNsEditInput(){
+  state.northStar=document.getElementById('nsedittext').value;
+  state.targetYear=document.getElementById('nsedityear').value;
+  document.getElementById('nstext').value=state.northStar;
+  document.getElementById('nsyear').value=state.targetYear;
+  renderNsBar();save();
+}
+
+/* ================= SCREEN 1 — SLIDERS ================= */
+function buildSliders(){
+  const host=document.getElementById('sliders');
+  host.innerHTML=AXES.map(a=>`
+    <div class="sliderblock">
+      <div class="top"><span class="name">${a.name}</span><span class="val" id="wval-${a.key}">${state.weights[a.key]}</span></div>
+      <div class="desc">${a.desc}</div>
+      <input type="range" min="1" max="5" step="1" value="${state.weights[a.key]}" id="w-${a.key}"
+        oninput="onWeight('${a.key}',this)">
+    </div>`).join('');
+  AXES.forEach(a=>paintRange(document.getElementById('w-'+a.key),1,5));
+}
+function paintRange(el,min,max){
+  const pct=((el.value-min)/(max-min))*100;
+  el.style.setProperty('--pct',pct+'%');
+}
+function onWeight(key,el){
+  state.weights[key]=+el.value;
+  document.getElementById('wval-'+key).textContent=el.value;
+  paintRange(el,1,5);save();
+}
+
+/* ================= SCREEN 2 — GUT ================= */
+const ROMAN=['I','II','III','IV'];
+function buildGut(){
+  const host=document.getElementById('gutcards');
+  host.innerHTML=OPTIONS.map((o,i)=>`
+    <div class="card gutcard" id="gc-${o.id}">
+      <div class="donetick">✓</div>
+      <div class="num">OPTION ${ROMAN[i]}</div>
+      <h3 class="h3">${o.title}</h3>
+      <p class="oneline">${o.oneline}</p>
+      <div class="lockrow"><span>🔒</span><span>The full write-up unlocks once your gut's on the record.</span></div>
+      <div class="gutq">Forget the logic. How much do you want this?</div>
+      <div class="gutval" id="gv-${o.id}">${state.gut[o.id].score? state.gut[o.id].score+'<span class="of"> / 10</span>':'<span class="of">slide to answer</span>'}</div>
+      <input type="range" min="1" max="10" step="1" value="${state.gut[o.id].score||5}" id="g-${o.id}"
+        oninput="onGut(${o.id},this)">
+      <div class="whyq">Why? First thing that comes into your head.</div>
+      <input class="textin" id="gw-${o.id}" value="" placeholder="One line, no editing yourself…" oninput="onGutWhy(${o.id},this)">
+    </div>`).join('');
+  OPTIONS.forEach(o=>{
+    document.getElementById('gw-'+o.id).value=state.gut[o.id].why;
+    const r=document.getElementById('g-'+o.id);paintRange(r,1,10);
+  });
+  renderGutState();
+}
+function onGut(id,el){
+  state.gut[id].score=+el.value;
+  document.getElementById('gv-'+id).innerHTML=el.value+'<span class="of"> / 10</span>';
+  paintRange(el,1,10);
+  renderGutState();save();
+}
+function onGutWhy(id,el){state.gut[id].why=el.value;save()}
+function renderGutState(){
+  let done=0;
+  OPTIONS.forEach(o=>{
+    const scored=state.gut[o.id].score>0;
+    document.getElementById('gc-'+o.id).classList.toggle('scored',scored);
+    if(scored)done++;
+  });
+  const all=done===4;
+  document.getElementById('unlockbtn').disabled=!all && !state.unlocked;
+  document.getElementById('unlockquote').style.display=state.unlocked?'block':'none';
+}
+function unlock(){
+  state.unlocked=true;save();
+  document.getElementById('unlockquote').style.display='block';
+  go(3);
+}
+
+/* ================= SCREEN 3 — WRITE-UPS ================= */
+function buildWriteups(){
+  const host=document.getElementById('wcards');
+  host.innerHTML=OPTIONS.map((o,i)=>`
+    <div class="card wcard" id="wc-${o.id}">
+      <div class="frost"><span class="lock">🔒</span><span class="locktxt">Locked</span></div>
+      <div class="body">
+        <div class="num">OPTION ${ROMAN[i]}</div>
+        <h3>${o.title}</h3>
+        <p class="oneline">${o.oneline}</p>
+        <div class="scorebars" id="bars-${o.id}"></div>
+        <div class="wtotal"><span class="lab">Weighted for what matters to you</span><span class="n" id="wt-${o.id}"></span></div>
+        <div id="badge-${o.id}"></div>
+        <div class="wsec brill"><div class="sect">Why this could be brilliant</div>
+          <ul>${o.brilliant.map(b=>'<li>'+b+'</li>').join('')}</ul></div>
+        <div class="wsec"><div class="sect">What you'd need to solve</div>
+          <ul>${o.solve.map(b=>'<li>'+b+'</li>').join('')}</ul></div>
+        <div class="wsec heart"><div class="sect">The heart of it</div><p>${o.heart}</p></div>
+        <div class="wsec sitting"><div class="sect">Worth sitting with</div><p>${o.sitting}</p></div>
+      </div>
+    </div>`).join('');
+}
+function renderWriteups(){
+  OPTIONS.forEach((o,i)=>{
+    const w=weightedScore(o.scores);
+    const gut=state.gut[o.id].score;
+    document.getElementById('bars-'+o.id).innerHTML=AXES.map(a=>{
+      const s=o.scores[a.key];
+      return `<div class="sbar${s>=8?' hi':''}">
+        <span class="lab">${a.name}</span>
+        <span class="n">${s}</span>
+        <div class="track"><div class="fill" data-w="${s*10}"></div></div>
+      </div>`;
+    }).join('');
+    document.getElementById('wt-'+o.id).innerHTML=fmt1(w)+'<span class="of"> / 10</span>';
+    const b=badgeFor(gut,w);
+    document.getElementById('badge-'+o.id).innerHTML=
+      `<div class="badge ${b.cls}">${b.txt}<span style="opacity:.65;font-weight:400">· your gut said ${gut}/10</span></div>`;
+  });
+  const cards=[...document.querySelectorAll('.wcard')];
+  if(!state.revealPlayed && state.unlocked){
+    state.revealPlayed=true;save();
+    cards.forEach((c,i)=>{
+      setTimeout(()=>{
+        c.classList.add('unlocked','revealing');
+        setTimeout(()=>animateBars(c),450);
+      },500+i*650);
+    });
+  }else{
+    cards.forEach(c=>{c.classList.add('unlocked');animateBars(c,true)});
+  }
+}
+function animateBars(card,instant){
+  card.querySelectorAll('.fill').forEach((f,j)=>{
+    const w=f.dataset.w+'%';
+    if(instant){f.style.transition='none';f.style.width=w;requestAnimationFrame(()=>f.style.transition='')}
+    else setTimeout(()=>{f.style.width=w},j*120);
+  });
+}
+
+/* ================= SCREEN 4 — IDEAS ================= */
+function buildIdeas(){
+  const host=document.getElementById('ideaslots');
+  host.innerHTML=state.ideas.map((idea,i)=>`
+    <div class="card ideaslot">
+      <div class="slotlabel">Blank slot ${i===0?'one':'two'} · yours</div>
+      ${IDEA_QS.map((q,qi)=>`
+        <div class="field" ${qi===0?'style="margin-top:6px"':''}>
+          <label class="fieldlabel">${q.label}</label>
+          ${q.hint?`<p class="fieldhint">${q.hint}</p>`:''}
+          ${q.two?`
+            <input class="textin" id="idea-${i}-name" placeholder="The name…" oninput="onIdea(${i},'name',this)">
+            <textarea id="idea-${i}-one" style="margin-top:10px" placeholder="The dinner-party sentence…" oninput="onIdea(${i},'one',this)"></textarea>
+          `:`
+            <textarea id="idea-${i}-${q.key}" ${q.big?'class="big"':''} oninput="onIdea(${i},'${q.key}',this)"></textarea>
+          `}
+        </div>`).join('')}
+      <div class="gutmini">
+        <div class="gutq" style="font-family:var(--serif);font-size:17px;color:var(--ocean)">And your gut? How much do you want this one?</div>
+        <div class="gutval" id="igv-${i}" style="font-family:var(--serif);font-size:30px;color:var(--terra);text-align:center;min-height:40px;line-height:40px">${idea.gut?idea.gut+'<span class="of" style="font-size:14px;color:var(--ink-soft)"> / 10</span>':'<span class="of" style="font-size:14px;color:var(--ink-soft)">slide to answer</span>'}</div>
+        <input type="range" min="1" max="10" step="1" value="${idea.gut||5}" id="ig-${i}" oninput="onIdeaGut(${i},this)">
+      </div>
+    </div>`).join('');
+  state.ideas.forEach((idea,i)=>{
+    document.getElementById(`idea-${i}-name`).value=idea.name;
+    document.getElementById(`idea-${i}-one`).value=idea.one;
+    ['a2','a3','a4','a5','a6','a7'].forEach(k=>{document.getElementById(`idea-${i}-${k}`).value=idea[k]});
+    paintRange(document.getElementById('ig-'+i),1,10);
+  });
+}
+function onIdea(i,key,el){state.ideas[i][key]=el.value;save()}
+function onIdeaGut(i,el){
+  state.ideas[i].gut=+el.value;
+  document.getElementById('igv-'+i).innerHTML=el.value+'<span class="of" style="font-size:14px;color:var(--ink-soft)"> / 10</span>';
+  paintRange(el,1,10);save();
+}
+
+/* ================= PASTE-BACK PARSING ================= */
+function parsePaste(text){
+  if(!text||!text.trim())return null;
+  const found={};
+  const pats={
+    grow:/room\s+to\s+grow/i, money:/money\s+soon/i, without:/earns?\s+without/i,
+    built:/uses?\s+what/i, life:/life\s+(?:you|i)\s+want/i, landing:/soft\s+landing/i
+  };
+  const lines=text.split(/\n/);
+  for(const line of lines){
+    for(const k of Object.keys(pats)){
+      if(found[k]===undefined && pats[k].test(line)){
+        const m=line.match(/(\d{1,2}(?:\.\d)?)\s*(?:\/|out of)\s*10/) || line.match(/[:—\-]\s*(\d{1,2}(?:\.\d)?)\b/);
+        if(m){const v=parseFloat(m[1]);if(v>=0&&v<=10)found[k]=v}
+      }
+    }
+  }
+  return Object.keys(found).length===6?found:null;
+}
+
+/* ================= SCREEN 5 — RANK ================= */
+function allEntries(){
+  const entries=OPTIONS.map((o,i)=>({
+    kind:'option',id:'o'+o.id,title:o.title,scores:o.scores,
+    gut:state.gut[o.id].score,weighted:weightedScore(o.scores)
+  }));
+  state.ideas.forEach((idea,i)=>{
+    if(!idea.name.trim())return;
+    const parsed=parsePaste(idea.paste);
+    entries.push({
+      kind:'idea',id:'i'+i,title:idea.name.trim(),one:idea.one,gut:idea.gut,
+      scores:parsed,weighted:parsed?weightedScore(parsed):null,
+      hasPaste:!!idea.paste.trim(),paste:idea.paste
+    });
+  });
+  return entries;
+}
+function renderRank(){
+  const entries=allEntries();
+  const ranked=entries.filter(e=>e.weighted!==null).sort((a,b)=>b.weighted-a.weighted);
+  const waiting=entries.filter(e=>e.weighted===null);
+  const host=document.getElementById('rankcards');
+  let html='';
+  ranked.forEach((e,i)=>{
+    html+=`<div class="card rankcard">
+      <div class="rankrow"><span class="pos">${i+1}</span><h3 class="h3">${e.title}</h3></div>
+      ${e.kind==='idea'?'<p class="pastenote" style="font-style:italic">Your idea — scored from the write-up you pasted back.</p>':''}
+      <div class="scores">
+        <div class="scr"><div class="n">${fmt1(e.weighted)}<span class="of"> / 10</span></div><div class="l">Weighted</div></div>
+        <div class="scr gut"><div class="n">${e.gut||'–'}${e.gut?'<span class="of"> / 10</span>':''}</div><div class="l">Your gut</div></div>
+      </div>
+      <div class="minibars">${AXES.map(a=>{
+        const s=e.scores[a.key];
+        return `<div class="sbar${s>=8?' hi':''}"><span class="lab">${a.name}</span><span class="n">${fmt1(s)}</span>
+          <div class="track"><div class="fill" style="width:${s*10}%"></div></div></div>`;
+      }).join('')}</div>
+    </div>`;
+  });
+  waiting.forEach(e=>{
+    html+=`<div class="card rankcard ready">
+      <div class="rankrow"><span class="pos">✦</span><h3 class="h3">${e.title}</h3></div>
+      ${e.one?`<p class="pastenote" style="font-style:italic">"${e.one}"</p>`:''}
+      <div class="readychip">Ready for Claude</div>
+      <p class="pastenote">${e.hasPaste?"We couldn't read six scores in what you pasted — it still counts, scores just can't rank it yet.":"Your idea, in the running. Send it to Claude at the end and it'll come back with scores of its own."}</p>
+      <div class="scores" style="margin-top:10px"><div class="scr gut"><div class="n">${e.gut||'–'}${e.gut?'<span class="of"> / 10</span>':''}</div><div class="l">Your gut</div></div></div>
+    </div>`;
+  });
+  host.innerHTML=html;
+}
+
+/* ================= SCREEN 6 — FEELINGS ================= */
+function namedChoices(){
+  const c=OPTIONS.map(o=>({key:'o'+o.id,label:o.title}));
+  state.ideas.forEach((idea,i)=>{if(idea.name.trim())c.push({key:'i'+i,label:idea.name.trim()})});
+  return c;
+}
+function renderFeel(){
+  const choices=namedChoices();
+  ['1','2','3'].forEach(q=>{
+    const host=document.getElementById('feel'+q);
+    host.innerHTML=choices.map(c=>`
+      <button class="pick${state.feelings['q'+q]===c.key?' sel':''}" onclick="pickFeel('${q}','${c.key}')">
+        <span class="dot"></span><span>${c.label}</span>
+      </button>`).join('');
+  });
+  document.getElementById('feel4').value=state.feelings.q4;
+  document.getElementById('feel4b').innerHTML=['wrong','big'].map(v=>`
+    <button class="pick${state.feelings.q4b===v?' sel':''}" onclick="pickFeel('4b','${v}')">
+      <span class="dot"></span><span>${v==='wrong'?"Because it might be wrong":"Because it's big"}</span>
+    </button>`).join('');
+  renderClosing();
+  document.getElementById('toclaudebtn').style.display=hasIdeas()?'inline-flex':'none';
+}
+function pickFeel(q,val){
+  state.feelings['q'+q]=state.feelings['q'+q]===val?'':val;
+  save();renderFeel();
+}
+function onFeel4Input(){state.feelings.q4=document.getElementById('feel4').value;save()}
+function renderClosing(){
+  const card=document.getElementById('closingcard');
+  const pickKey=state.feelings.q1||state.feelings.q2;
+  if(!pickKey){card.classList.remove('show');return}
+  const choice=namedChoices().find(c=>c.key===pickKey);
+  if(!choice){card.classList.remove('show');return}
+  document.getElementById('closingpick').textContent='So it’s '+choice.label+'.';
+  card.classList.add('show');
+}
+
+/* ================= SCREEN 7 — CLAUDE ================= */
+function buildPrompt(){
+  const L=[];
+  L.push("Hi Claude — I'm working out what to do with my business in 2027 and I'd love your take");
+  L.push("on a couple of ideas I've come up with. Be honest but constructive — I'm at the");
+  L.push("brainstorming stage, so help me see the potential as well as the problems.");
+  L.push("");
+  L.push("MY GOAL");
+  if(state.northStar.trim())L.push(state.northStar.trim());
+  if(state.targetYear)L.push("I want to be standing on that deck by: "+state.targetYear);
+  L.push("");
+  L.push("ABOUT ME");
+  L.push("I'm a chiropractor in Brisbane with an established patient base. I also run Postur., a");
+  L.push("postural wellness brand. I want to move to Sydney. My brother runs a chiro clinic where");
+  L.push("contractor chiropractors pay 50% of their billings, and I could replicate that model.");
+  L.push("I have friends who would likely invest, and my partner has corporate contacts that could");
+  L.push("help Postur. I'm currently working 12-hour days and I want to build something that");
+  L.push("earns without me in it.");
+  L.push("");
+  L.push("WHAT MATTERS MOST TO ME");
+  AXES.forEach(a=>L.push("- "+a.name+": "+state.weights[a.key]+"/5"));
+  L.push("");
+  L.push("OPTIONS ALREADY ON MY LIST (context only — these are already written up)");
+  const optLines=[
+    "1. Build a hybrid chiro clinic × Postur. storefront in Brisbane, train the team, hand my patients over, then move to Sydney and open site two.",
+    "2. Move to Sydney in January and build from there.",
+    "3. Go straight to Sydney and build the clinic there.",
+    "4. Raise for Postur. and go full time on it."
+  ];
+  OPTIONS.forEach((o,i)=>{
+    let line=optLines[i];
+    const g=state.gut[o.id];
+    if(g.score){line+=" Gut feel "+g.score+"/10";if(g.why.trim())line+=' — "'+g.why.trim()+'"'}
+    L.push(line);
+  });
+  L.push("");
+  L.push("MY OWN IDEAS — THESE ARE THE ONES I'D LIKE YOU TO LOOK AT");
+  state.ideas.forEach(idea=>{
+    if(!idea.name.trim())return;
+    L.push("");
+    L.push("IDEA: "+idea.name.trim());
+    if(idea.one.trim())L.push("In one sentence: "+idea.one.trim());
+    if(idea.a2.trim())L.push("Where I'd live and what a Tuesday looks like: "+idea.a2.trim());
+    if(idea.a3.trim())L.push("Who pays me, and what they spend it on instead: "+idea.a3.trim());
+    if(idea.a4.trim())L.push("What it uses that I've already built: "+idea.a4.trim());
+    if(idea.a5.trim())L.push("What I'd need that I haven't got: "+idea.a5.trim());
+    if(idea.a6.trim())L.push("Cheapest way to test it in a month: "+idea.a6.trim());
+    if(idea.a7.trim())L.push("What would make me walk away, and by when: "+idea.a7.trim());
+    if(idea.gut)L.push("My gut feel: "+idea.gut+"/10");
+  });
+  L.push("");
+  L.push("WHAT I'D LOVE BACK");
+  L.push("For each of MY ideas, please give me:");
+  L.push("");
+  L.push("1. Scores out of 10 on these six, one line of reasoning each:");
+  L.push("   - Room to grow (can it get me to the goal, or does it top out below?)");
+  L.push("   - Money soon");
+  L.push("   - Earns without me");
+  L.push("   - Uses what I've already built");
+  L.push("   - The life I want now (Sydney, settled, out of 12-hour days)");
+  L.push("   - Soft landing (10 = easy to recover if it fails, 1 = high stakes)");
+  L.push("");
+  L.push("2. Why this could be brilliant — 3 to 4 points");
+  L.push("3. What I'd need to solve — 2 to 3 points, framed as solvable");
+  L.push("4. The heart of it — one short warm paragraph");
+  L.push("5. One thing worth sitting with");
+  L.push("");
+  L.push("Then:");
+  L.push("6. Where my idea lands against the four options above");
+  L.push("7. The single easiest thing I could do in the next month to find out if my best idea is real");
+  L.push("");
+  L.push("Keep it tight and skip the preamble. And if you spot an option I haven't thought of at");
+  L.push("all, tell me — that's the one I'd most like to hear.");
+  return L.join("\n");
+}
+function copyPrompt(){
+  const text=buildPrompt();
+  const done=()=>{
+    const btn=document.getElementById('copybtn');
+    btn.classList.add('copied');
+    setTimeout(()=>btn.classList.remove('copied'),2600);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{fallbackCopy(text);done()});
+  }else{fallbackCopy(text);done()}
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta);
+}
+function togglePrompt(){
+  const el=document.getElementById('promptreveal');
+  const open=el.classList.toggle('open');
+  if(open)el.textContent=buildPrompt();
+  document.getElementById('showpromptbtn').textContent=open?'Hide it again':"Show me what I'm sending";
+}
+function renderClaude(){
+  const host=document.getElementById('pastebacks');
+  let html='';
+  state.ideas.forEach((idea,i)=>{
+    if(!idea.name.trim())return;
+    html+=`<div class="card pasteback">
+      <span class="eyebrow ocean">When Claude replies</span>
+      <h3 class="h3" style="margin:10px 0 6px">${idea.name.trim()}</h3>
+      <p class="small" style="margin-bottom:12px">Paste the write-up here and it joins the comparison.</p>
+      <textarea class="big" id="paste-${i}" style="min-height:140px" placeholder="Paste Claude's write-up…" oninput="onPaste(${i},this)"></textarea>
+      <p class="small" id="pastestatus-${i}" style="margin-top:10px"></p>
+    </div>`;
+  });
+  host.innerHTML=html;
+  state.ideas.forEach((idea,i)=>{
+    const ta=document.getElementById('paste-'+i);
+    if(ta){ta.value=idea.paste;paintPasteStatus(i)}
+  });
+  const rev=document.getElementById('promptreveal');
+  if(rev.classList.contains('open'))rev.textContent=buildPrompt();
+}
+function onPaste(i,el){state.ideas[i].paste=el.value;save();paintPasteStatus(i)}
+function paintPasteStatus(i){
+  const el=document.getElementById('pastestatus-'+i);
+  if(!el)return;
+  const idea=state.ideas[i];
+  if(!idea.paste.trim()){el.textContent='';return}
+  const parsed=parsePaste(idea.paste);
+  el.innerHTML=parsed
+    ?'<span style="color:var(--terra);font-weight:600">✓ Got it — all six scores found. It’s in the comparison.</span>'
+    :'Saved. We couldn’t pick out six scores automatically — the text is kept, and you can still compare by eye.';
+}
+
+/* ================= START OVER / PRINT ================= */
+function startOver(){
+  if(confirm("Start over? Everything you've written here will be cleared.")){
+    try{localStorage.removeItem(KEY)}catch(e){}
+    location.reload();
+  }
+}
+window.addEventListener('beforeprint',()=>{
+  renderRank();renderFeel();
+  document.getElementById('s5').classList.add('printable');
+  document.getElementById('s6').classList.add('printable');
+});
+window.addEventListener('afterprint',()=>{
+  document.getElementById('s5').classList.remove('printable');
+  document.getElementById('s6').classList.remove('printable');
+});
+
+/* ================= INIT ================= */
+load();
+document.getElementById('nstext').value=state.northStar;
+document.getElementById('nsyear').value=state.targetYear;
+buildSliders();
+buildGut();
+buildWriteups();
+buildIdeas();
+render();
+</script>
+</body>
+</html>
