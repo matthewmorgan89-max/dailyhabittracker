@@ -777,7 +777,7 @@ const DEFAULT_NS_MINE="Buy my dream house in Byron Bay (~$12m), with a good work
 /* ================= STATE ================= */
 const KEY='byron-plan-v1';
 let state={
-  screen:0,maxScreen:0,unlocked:false,revealPlayed:false,
+  screen:0,maxScreen:0,layout:0,unlocked:false,revealPlayed:false,
   northStar:DEFAULT_NS,targetYear:'',
   weights:{grow:3,money:3,without:3,built:3,life:3,landing:3},
   gut:{1:{score:0,why:''},2:{score:0,why:''},3:{score:0,why:''},4:{score:0,why:''}},
@@ -788,14 +788,20 @@ let state={
   feelings:{q1:'',q2:'',q3:'',q4:'',q4b:''}
 };
 
+/* Bumped whenever the screens are renumbered. Answers are kept, but the saved
+   position is dropped so nobody resumes on a screen that has since moved. */
+const LAYOUT=3;
+
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function load(){
   try{
     const raw=localStorage.getItem(KEY);
     if(raw){const s=JSON.parse(raw);state=Object.assign(state,s);
       state.weights=Object.assign({grow:3,money:3,without:3,built:3,life:3,landing:3},s.weights||{});
+      if(s.layout!==LAYOUT){state.screen=0;state.maxScreen=0}
     }
   }catch(e){}
+  state.layout=LAYOUT;
 }
 
 /* ================= SCORING ================= */
