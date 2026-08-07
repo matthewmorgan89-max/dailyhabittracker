@@ -399,7 +399,7 @@ footer button:hover{color:var(--terra)}
   body{background:#fff}
   #nsbar,#nsedit,footer,.actions,.backlink,.quote,.btn,.noscreen-print{display:none !important}
   .screen{display:none !important}
-  #s5.printable,#s6.printable{display:block !important;animation:none;padding:0}
+  #s4.printable,#s5.printable{display:block !important;animation:none;padding:0}
   .printonly{display:block;page-break-before:always}
   .card,.rankcard{box-shadow:none;break-inside:avoid}
   .closing{background:#fff;color:var(--ink);border:1px solid var(--hairline);box-shadow:none}
@@ -487,32 +487,11 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 2 — YOUR OWN IDEAS ======== -->
+<!-- ======== SCREEN 2 — GUT CHECK ======== -->
 <section class="screen" id="s2">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">02 · Your own ideas</span>
-      <h2 class="h2">Before anything else, what would you do?</h2>
-      <p class="lede">In a minute you'll see four options that have already been written up. But the best one might be something nobody has thought of yet, and it's much easier to hear your own idea before you've read anyone else's.</p>
-      <p class="lede">So here are two blank slots. There are no rules and nothing is too ambitious. If nothing comes to mind, skip straight past and carry on. You can always come back later.</p>
-    </div>
-    <div id="ideaslots"></div>
-    <div class="actions">
-      <button class="btn" onclick="go(3)" id="ideasnextbtn">Now show me the options</button>
-    </div>
-    <a class="backlink" href="javascript:go(1)">← Your north star</a>
-    <div class="quote">
-      <p class="q">"Everything is figureoutable."</p>
-      <p class="a">Marie Forleo</p>
-    </div>
-  </div>
-</section>
-
-<!-- ======== SCREEN 3 — GUT CHECK ======== -->
-<section class="screen" id="s3">
-  <div class="wrap">
-    <div class="shead">
-      <span class="eyebrow">03 · Gut check</span>
+      <span class="eyebrow">02 · Gut check</span>
       <h2 class="h2">Your gut goes first.</h2>
       <p class="lede">You've been living with this for months, which means you already know things you haven't put into words yet. Write them down before you read anyone else's opinion. Afterwards you'll see where your instinct agrees with the analysis and where the two part company, and that gap is usually where the interesting stuff is hiding.</p>
     </div>
@@ -520,7 +499,7 @@ footer button:hover{color:var(--terra)}
     <div class="actions">
       <button class="btn terra" id="unlockbtn" disabled onclick="unlock()">Show me what you think</button>
     </div>
-    <a class="backlink" href="javascript:go(2)">← Your own ideas</a>
+    <a class="backlink" href="javascript:go(1)">← Your north star</a>
     <div class="quote" id="unlockquote" style="display:none">
       <p class="q">"Don't be intimidated by what you don't know. That can be your greatest strength and ensure that you do things differently from everyone else."</p>
       <p class="a">Sara Blakely</p>
@@ -528,11 +507,11 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 4 — WRITE-UPS ======== -->
-<section class="screen" id="s4">
+<!-- ======== SCREEN 3 — WRITE-UPS + YOUR OWN IDEAS ======== -->
+<section class="screen" id="s3">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">04 · The write-ups</span>
+      <span class="eyebrow">03 · The options</span>
       <h2 class="h2">Here's what we think.</h2>
       <p class="scorenote" style="text-align:left;margin-top:4px">Treat these scores as opinions rather than maths. If one of them annoys you, that's useful information. Argue with it.</p>
     </div>
@@ -546,35 +525,42 @@ footer button:hover{color:var(--terra)}
       <p><strong>And here are two ideas that aren't on the list yet.</strong></p>
       <p><strong>What if you open Brisbane but don't stay there?</strong> Build it, train the team properly, hand your patients over, and then live in Sydney, flying back once a month. That might be the version that gets you both things at once.</p>
       <p><strong>What if the patients you leave behind are worth something?</strong> You've assumed that 70 per cent move with you and the rest simply vanish. But the remaining book, the location and the systems might be worth selling rather than writing off.</p>
-      <p class="spark">If either of those sparks something, your blank slots are still there and still editable.</p>
-      <p style="margin-top:18px"><button class="btn ghost" style="background:rgba(250,246,238,.1);color:#F6EFDE;border-color:rgba(246,239,222,.35)" onclick="go(2)">Go back and add an idea</button></p>
+      <p class="spark">There are two blank slots just below if either of those sparks something.</p>
     </div>
 
-    <div class="actions">
-      <button class="btn" onclick="go(5)">See everything side by side</button>
+    <div class="shead" style="padding-top:56px">
+      <span class="eyebrow">Still on the options · yours to add</span>
+      <h2 class="h2">What if it's none of these?</h2>
+      <p class="lede">Those four are the options as they stand today, and none of them has to be the answer. The best one might be something nobody has written down yet, including us.</p>
+      <p class="lede">Here are two blank slots sitting alongside the others. There are no rules and nothing is too ambitious. If nothing comes to mind, skip straight past and carry on.</p>
     </div>
-    <a class="backlink" href="javascript:go(3)">← Your gut scores</a>
+    <div id="ideaslots"></div>
+
+    <div class="actions">
+      <button class="btn" onclick="go(4)">See everything side by side</button>
+    </div>
+    <a class="backlink" href="javascript:go(2)">← Your gut scores</a>
     <div class="quote">
-      <p class="q">"Talk to yourself like you would to someone you love."</p>
-      <p class="a">Brené Brown</p>
+      <p class="q">"Everything is figureoutable."</p>
+      <p class="a">Marie Forleo</p>
     </div>
   </div>
 </section>
 
-<!-- ======== SCREEN 5 — SIDE BY SIDE ======== -->
-<section class="screen" id="s5">
+<!-- ======== SCREEN 4 — SIDE BY SIDE ======== -->
+<section class="screen" id="s4">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">05 · Everything, side by side</span>
+      <span class="eyebrow">04 · Everything, side by side</span>
       <h2 class="h2">The whole picture.</h2>
       <p class="lede">Ranked by what matters most to you, with your gut score sitting right alongside so any gap between the two stays visible.</p>
     </div>
     <div id="rankcards"></div>
     <div class="actions">
-      <button class="btn terra" onclick="go(6)">How do I feel about this?</button>
+      <button class="btn terra" onclick="go(5)">How do I feel about this?</button>
       <button class="btn ghost" onclick="window.print()">Save as PDF</button>
     </div>
-    <a class="backlink" href="javascript:go(4)">← The write-ups</a>
+    <a class="backlink" href="javascript:go(3)">← The options</a>
     <div class="quote">
       <p class="q">"Clear is kind. Unclear is unkind."</p>
       <p class="a">Brené Brown</p>
@@ -582,11 +568,11 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 6 — HOW DO YOU FEEL ======== -->
-<section class="screen" id="s6">
+<!-- ======== SCREEN 5 — HOW DO YOU FEEL ======== -->
+<section class="screen" id="s5">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">06 · How do you feel?</span>
+      <span class="eyebrow">05 · How do you feel?</span>
       <h2 class="h2">Now the actual question.</h2>
       <p class="lede">You've seen everything now. Scores are only scores. This is the part that actually matters.</p>
     </div>
@@ -626,11 +612,11 @@ footer button:hover{color:var(--terra)}
       <p>None of this is locked in. Come back and change it whenever you like. That's exactly what it's here for.</p>
     </div>
 
-    <div class="actions" id="s6actions">
-      <button class="btn" id="toclaudebtn" onclick="go(7)" style="display:none">Send your ideas to Claude</button>
+    <div class="actions" id="s5actions">
+      <button class="btn" id="toclaudebtn" onclick="go(6)" style="display:none">Send your ideas to Claude</button>
       <button class="btn ghost" onclick="window.print()">Save as PDF</button>
     </div>
-    <a class="backlink" href="javascript:go(5)">← Side by side</a>
+    <a class="backlink" href="javascript:go(4)">← Side by side</a>
     <div class="quote">
       <p class="q">"You get in life what you have the courage to ask for."</p>
       <p class="a">Oprah Winfrey</p>
@@ -638,11 +624,11 @@ footer button:hover{color:var(--terra)}
   </div>
 </section>
 
-<!-- ======== SCREEN 7 — SEND TO CLAUDE ======== -->
-<section class="screen" id="s7">
+<!-- ======== SCREEN 6 — SEND TO CLAUDE ======== -->
+<section class="screen" id="s6">
   <div class="wrap">
     <div class="shead">
-      <span class="eyebrow">07 · Optional, entirely up to you</span>
+      <span class="eyebrow">06 · Optional, entirely up to you</span>
       <h2 class="h2">Want your own ideas looked at properly?</h2>
       <p class="lede">The four original options were written up long before you opened this. Your ideas are brand new, and nobody has taken a proper look at them yet.</p>
     </div>
@@ -672,9 +658,9 @@ footer button:hover{color:var(--terra)}
     <div id="pastebacks"></div>
 
     <div class="actions">
-      <button class="btn" onclick="go(5)">Back to the comparison</button>
+      <button class="btn" onclick="go(4)">Back to the comparison</button>
     </div>
-    <a class="backlink" href="javascript:go(6)">← How you feel</a>
+    <a class="backlink" href="javascript:go(5)">← How you feel</a>
   </div>
 </section>
 
@@ -829,7 +815,7 @@ function badgeFor(gut,weighted){
 
 /* ================= NAVIGATION ================= */
 function go(n){
-  if(n===7 && !hasIdeas()){n=5}
+  if(n===6 && !hasIdeas()){n=4}
   state.screen=n;
   if(n>state.maxScreen)state.maxScreen=n;
   save();
@@ -846,18 +832,18 @@ function render(){
   bar.classList.toggle('visible',state.screen>=1);
   renderNsBar();
   if(state.screen===1)requestAnimationFrame(()=>autoGrow(document.getElementById('nstext')));
-  if(state.screen===3)renderGutState();
-  if(state.screen===4)renderWriteups();
-  if(state.screen===5)renderRank();
-  if(state.screen===6)renderFeel();
-  if(state.screen===7)renderClaude();
+  if(state.screen===2)renderGutState();
+  if(state.screen===3)renderWriteups();
+  if(state.screen===4)renderRank();
+  if(state.screen===5)renderFeel();
+  if(state.screen===6)renderClaude();
 }
 
 /* ================= NORTH STAR ================= */
 function renderNsBar(){
   document.getElementById('nsbartxt').textContent=state.northStar;
   document.getElementById('nsbaryr').textContent=state.targetYear?('· '+state.targetYear):'';
-  const pct=Math.min(100,Math.round(state.maxScreen/7*100));
+  const pct=Math.min(100,Math.round(state.maxScreen/6*100));
   document.getElementById('nsprogressfill').style.width=pct+'%';
 }
 function autoGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+4)+'px'}
@@ -948,7 +934,7 @@ function renderGutState(){
 function unlock(){
   state.unlocked=true;save();
   document.getElementById('unlockquote').style.display='block';
-  go(4);
+  go(3);
 }
 
 /* ================= SCREEN 3 — WRITE-UPS ================= */
@@ -1299,12 +1285,12 @@ function startOver(){
 }
 window.addEventListener('beforeprint',()=>{
   renderRank();renderFeel();
+  document.getElementById('s4').classList.add('printable');
   document.getElementById('s5').classList.add('printable');
-  document.getElementById('s6').classList.add('printable');
 });
 window.addEventListener('afterprint',()=>{
+  document.getElementById('s4').classList.remove('printable');
   document.getElementById('s5').classList.remove('printable');
-  document.getElementById('s6').classList.remove('printable');
 });
 
 /* ================= INIT ================= */
